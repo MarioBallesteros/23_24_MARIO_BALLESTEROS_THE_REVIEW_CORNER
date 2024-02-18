@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:thefluttercorner/features/users/user.dart'; // Asegúrate de importar tu clase User
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gap/gap.dart';
+import 'package:thefluttercorner/features/users/user_page.dart';
 import '../../widgets/widgets.dart';
 
 class UsersPage extends StatelessWidget {
   const UsersPage({super.key});
-//asd
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ContentView(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Users'),
+      ),
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const PageHeader(
@@ -48,8 +52,10 @@ class UsersPage extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.navigate_next_outlined),
                         onTap: () {
-                          // Aquí puedes definir lo que sucede cuando se toca un usuario
-                          // Por ejemplo, navegar a una página de detalles del usuario
+                          // Navegación a UserPage con los datos del usuario
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => UserPage(user: user)),
+                          );
                         },
                       );
                     },
@@ -59,6 +65,14 @@ class UsersPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => UserPage(user: User(userId: '', name: '', role: ''))),
+          );
+        },
       ),
     );
   }

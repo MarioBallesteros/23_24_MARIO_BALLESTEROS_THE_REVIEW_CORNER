@@ -13,7 +13,9 @@ class DashBoardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Asumiendo que tienes una forma de obtener un objeto responsive, ajusta esto según tu implementación
     final responsive = ResponsiveBreakpoints.of(context);
+    // Definir summaryCards dentro del método build
     const summaryCards = [
       SummaryCard(title: 'Total Sales', value: '\$125,000'),
       SummaryCard(title: 'Total Users', value: '12,000'),
@@ -21,6 +23,12 @@ class DashBoardPage extends StatelessWidget {
     ];
 
     return ContentView(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          // Tu código para manejar el FloatingActionButton aquí...
+        },
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,6 +55,7 @@ class DashBoardPage extends StatelessWidget {
     );
   }
 }
+
 
 class _TableView extends StatelessWidget {
   const _TableView();

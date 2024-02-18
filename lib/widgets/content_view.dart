@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class ContentView extends StatelessWidget {
-  const ContentView({super.key, required this.child});
+  const ContentView({super.key, required this.child, required FloatingActionButton floatingActionButton});
 
   final Widget child;
 
