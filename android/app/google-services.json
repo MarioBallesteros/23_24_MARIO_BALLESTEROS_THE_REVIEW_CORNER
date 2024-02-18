@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "639567467813",
+    "project_id": "the-review-corner",
+    "storage_bucket": "the-review-corner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639567467813:android:420971297b251ec0e7b6cc",
+        "android_client_info": {
+          "package_name": "com.example.thefluttercorner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639567467813-0q86f8q2ssrljh5biahhfjkmrl97j1la.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0NTs3tl0qmSc9mcwplye6zzC1QnrMoGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639567467813-0q86f8q2ssrljh5biahhfjkmrl97j1la.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "639567467813-5hq9in914eto3b3in72a9euptnjja1ih.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.thefluttercorner"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

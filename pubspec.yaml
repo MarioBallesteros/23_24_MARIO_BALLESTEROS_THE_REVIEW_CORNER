@@ -1,0 +1,37 @@
+name: thefluttercorner
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.6 <4.0.0'
+
+dependencies:
+  firebase_core: ^2.25.2
+  cloud_firestore: 4.15.4 # Verifica la última versión en pub.dev
+  adaptive_theme:
+  collection:
+  cupertino_icons:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  gap:
+  go_router:
+  google_fonts:
+  intersperse:
+  recase:
+  responsive_framework:
+  simple_logger:
+  two_dimensional_scrollables:
+
+dev_dependencies:
+  build_runner:
+  build_verify:
+  flutter_test:
+    sdk: flutter
+  go_router_builder:
+  pedantic_mono:
+
+flutter:
+  uses-material-design: true
