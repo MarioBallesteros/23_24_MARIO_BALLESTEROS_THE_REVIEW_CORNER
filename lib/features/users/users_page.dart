@@ -30,10 +30,10 @@ class UsersPage extends StatelessWidget {
                 stream: FirebaseFirestore.instance.collection('users').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData) {
-                    return Center(child: Text("No hay datos disponibles"));
+                    return const Center(child: Text("No hay datos disponibles"));
                   }
                   final users = snapshot.data!.docs.map((doc) => User.fromFirestore(doc)).toList();
                   return ListView.separated(

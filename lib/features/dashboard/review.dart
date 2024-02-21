@@ -20,6 +20,8 @@ class Review {
     required this.creationDate,
   });
 
+
+
   // Método para crear una instancia de Review a partir de un documento de Firestore
   factory Review.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
