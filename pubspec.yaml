@@ -8,30 +8,30 @@ environment:
 
 dependencies:
   firebase_core: ^2.25.2
-  cloud_firestore: 4.15.4 # Verifica la última versión en pub.dev
-  adaptive_theme:
-  collection:
-  cupertino_icons:
+  cloud_firestore: ^4.15.5
+  adaptive_theme: ^3.6.0  # Asegúrate de especificar la versión
+  collection: ^1.16.0  # Asegúrate de especificar la versión
+  cupertino_icons: ^1.0.2  # Asegúrate de especificar la versión
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  gap:
-  go_router:
-  google_fonts:
-  intersperse:
-  recase:
-  responsive_framework:
-  simple_logger:
-  two_dimensional_scrollables:
+  gap: ^3.0.1  # Asegúrate de especificar la versión
+  go_router: ^13.2.0  # Asegúrate de especificar la versión
+  google_fonts: ^6.1.0  # Especifica la última versión compatible
+  intersperse: ^2.0.0  # Asegúrate de especificar la versión
+  recase: ^4.0.0  # Asegúrate de especificar la versión
+  responsive_framework: ^1.1.1  # Asegúrate de especificar la versión
+  simple_logger: ^1.0.0  # Asegúrate de especificar la versión
+  two_dimensional_scrollables: ^0.1.0  # Asegúrate de especificar la versión
 
 dev_dependencies:
-  build_runner:
-  build_verify:
+  build_runner: ^2.1.7  # Asegúrate de especificar la versión
+  build_verify: ^3.1.0  # Asegúrate de especificar la versión
   flutter_test:
     sdk: flutter
-  go_router_builder:
-  pedantic_mono:
+  go_router_builder: ^2.0.0  # Asegúrate de especificar la versión
+  pedantic_mono: ^1.11.0  # Asegúrate de especificar la versión
 
 flutter:
   uses-material-design: true
