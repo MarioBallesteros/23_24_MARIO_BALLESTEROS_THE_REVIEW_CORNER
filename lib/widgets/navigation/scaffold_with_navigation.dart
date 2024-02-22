@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:thefluttercorner/main.dart';
-import 'package:thefluttercorner/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:thefluttercorner/widgets/navigation/theme_mode_button.dart';
+
+import 'navigation_app_bar.dart';
+import 'navigation_item.dart';
 
 class ScaffoldWithNavigation extends StatelessWidget {
   const ScaffoldWithNavigation({

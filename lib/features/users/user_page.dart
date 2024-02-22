@@ -73,6 +73,37 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
+  Future<void> _deleteUser() async {
+    final bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar'),
+          content: const Text('¿Estás seguro de que quieres eliminar este usuario?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+
+    if (confirmDelete) {
+      if (widget.user.userId.isNotEmpty) {
+        // Eliminar el usuario de Firestore
+        await FirebaseFirestore.instance.collection('users').doc(widget.user.userId).delete();
+        Navigator.of(context).pop(); // Regresa a la pantalla anterior después de eliminar
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,16 +122,30 @@ class _UserPageState extends State<UserPage> {
               controller: _roleController,
               decoration: const InputDecoration(labelText: 'Role'),
             ),
-            ElevatedButton(
-              onPressed: _saveUser,
-              child: const Text('Save'),
-            ),
+            // Si necesitas un botón "Guardar" dentro del cuerpo, muévelo aquí.
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _saveUser,
-        child: const Icon(Icons.save),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked, // Ubica el FAB principal en la esquina inferior derecha
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(left: 34.0,bottom: 30.0), // Ajusta este valor según necesites
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Alinea los botones a los extremos
+          children: <Widget>[
+            if (widget.user.userId.isNotEmpty) // Muestra el botón de eliminar solo si es un usuario existente
+              FloatingActionButton(
+                heroTag: "btn1",
+                onPressed: _deleteUser,
+                child: const Icon(Icons.delete),
+                backgroundColor: Colors.red,
+              ),
+            FloatingActionButton(
+              heroTag: "btn2",
+              onPressed: _saveUser,
+              child: const Icon(Icons.save),
+            ),
+          ],
+        ),
       ),
     );
   }

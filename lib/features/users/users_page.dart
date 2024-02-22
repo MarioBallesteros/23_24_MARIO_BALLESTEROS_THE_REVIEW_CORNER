@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:thefluttercorner/features/users/user.dart'; // Asegúrate de importar tu clase User
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gap/gap.dart';
-import 'package:thefluttercorner/features/users/user_page.dart';
-import '../../widgets/widgets.dart';
+import 'package:thefluttercorner/features/users/user.dart'; // Asegúrate de que la ruta de importación es correcta
+import 'package:thefluttercorner/features/users/user_page.dart'; // Asegúrate de que la ruta de importación es correcta
+import '../../widgets/widgets.dart'; // Asegúrate de que la ruta de importación es correcta
 
 class UsersPage extends StatelessWidget {
   const UsersPage({super.key});
@@ -43,11 +43,11 @@ class UsersPage extends StatelessWidget {
                       final user = users[index];
                       return ListTile(
                         title: Text(
-                          user.name,
+                          '${user.name} (ID: ${user.userId})', // Muestra el nombre y el ID del usuario
                           style: theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
-                          user.role,
+                          'Role: ${user.role}', // Muestra el rol del usuario
                           style: theme.textTheme.labelMedium,
                         ),
                         trailing: const Icon(Icons.navigate_next_outlined),
@@ -66,14 +66,17 @@ class UsersPage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => UserPage(user: User(userId: '', name: '', role: ''))),
-          );
-        },
-      ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 20), // Añade un margen inferior de 30
+          child: FloatingActionButton(
+            child: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => UserPage(user: User(userId: '', name: '', role: ''))),
+              );
+            },
+          ),
+        )
     );
   }
 }

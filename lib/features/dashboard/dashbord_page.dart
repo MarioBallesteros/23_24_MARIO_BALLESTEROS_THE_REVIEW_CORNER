@@ -9,6 +9,8 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import '../../widgets/widgets.dart';
 import 'package:thefluttercorner/features/dashboard/review.dart';
 
+import 'ReviewDetailsPage.dart';
+
 class DashBoardPage extends StatelessWidget {
   const DashBoardPage({Key? key}) : super(key: key);
 
@@ -32,7 +34,7 @@ class DashBoardPage extends StatelessWidget {
               reviewText: '',
               rating: 0.0,
               userId: '',
-              creationDate: Timestamp.now(),
+              creationDate: Timestamp.now(), imageUrls: [],
             ))),
           );
         },
@@ -84,15 +86,11 @@ class _ReviewsView extends StatelessWidget {
 
           return TableView.builder(
             columnCount: Review.itemCount,
-            rowCount: reviews.length + 1, // +1 por la fila de encabezado
+            rowCount: reviews.length + 1,
             pinnedRowCount: 1,
             pinnedColumnCount: 0,
-            columnBuilder: (index) => TableSpan(
-              extent: FixedTableSpanExtent(200), // Ajusta según la necesidad
-            ),
-            rowBuilder: (index) => TableSpan(
-              extent: FixedTableSpanExtent(60), // Ajusta según la necesidad
-            ),
+            columnBuilder: (index) => TableSpan(extent: FixedTableSpanExtent(200)),
+            rowBuilder: (index) => TableSpan(extent: FixedTableSpanExtent(60)),
             cellBuilder: (context, vicinity) {
               final isHeader = vicinity.yIndex == 0;
               String label = isHeader ? Review.getHeaderLabel(vicinity.xIndex) : reviews[vicinity.yIndex - 1].getLabelForIndex(vicinity.xIndex);
@@ -100,8 +98,9 @@ class _ReviewsView extends StatelessWidget {
               return TableViewCell(
                 child: InkWell(
                   onTap: isHeader ? null : () {
+                    // Navegar a la página de detalles de la review con la review seleccionada
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ReviewPage(review: reviews[vicinity.yIndex - 1])),
+                      MaterialPageRoute(builder: (context) => ReviewDetailsPage(review: reviews[vicinity.yIndex - 1])),
                     );
                   },
                   child: Padding(
@@ -124,3 +123,5 @@ class _ReviewsView extends StatelessWidget {
     );
   }
 }
+
+

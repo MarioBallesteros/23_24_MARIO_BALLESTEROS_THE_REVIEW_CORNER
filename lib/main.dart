@@ -9,8 +9,8 @@ import 'firebase_options.dart';
 import 'router.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de llamar a esto primero antes de inicializar Firebase
-  usePathUrlStrategy(); // Mantén esta llamada si estás personalizando la estrategia de URL para Flutter web
+  WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, // Usa las opciones generadas por flutterfire configure
   );

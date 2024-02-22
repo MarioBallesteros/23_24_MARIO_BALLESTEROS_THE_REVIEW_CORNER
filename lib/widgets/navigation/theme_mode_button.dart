@@ -22,32 +22,32 @@ class ThemeModeButton extends StatelessWidget {
     final brightness = Theme.of(context).brightness;
     final (iconData, action, actionLabel) = switch (brightness) {
       Brightness.light => (
-          Icons.dark_mode_outlined,
-          AdaptiveTheme.of(context).setDark,
-          'Switch to dark'
-        ),
+      Icons.dark_mode_outlined,
+      AdaptiveTheme.of(context).setDark,
+      'Switch to dark'
+      ),
       Brightness.dark => (
-          Icons.light_mode_outlined,
-          AdaptiveTheme.of(context).setLight,
-          'Switch to light'
-        )
+      Icons.light_mode_outlined,
+      AdaptiveTheme.of(context).setLight,
+      'Switch to light'
+      )
     };
 
     return switch (variant) {
       _Variant.icon => IconButton(
-          icon: Icon(iconData),
-          onPressed: action,
-        ),
+        icon: Icon(iconData),
+        onPressed: action,
+      ),
       _Variant.outlined => OutlinedButton.icon(
-          onPressed: action,
-          icon: Icon(iconData),
-          label: Text(actionLabel),
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: colorScheme.primary.withOpacity(0.5),
-            ),
+        onPressed: action,
+        icon: Icon(iconData),
+        label: Text(actionLabel),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(
+            color: colorScheme.primary.withOpacity(0.5),
           ),
-        )
+        ),
+      )
     };
   }
 }

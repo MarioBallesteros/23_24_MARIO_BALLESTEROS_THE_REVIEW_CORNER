@@ -3,12 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:thefluttercorner/features/users/user_not_found_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thefluttercorner/widgets/navigation/scaffold_with_navigation.dart';
 
 import 'features/dashboard/dashbord_page.dart';
 import 'features/users/dummy_users.dart';
 import 'features/users/user_page.dart';
 import 'features/users/users_page.dart';
-import 'widgets/widgets.dart';
 
 part 'router.g.dart';
 

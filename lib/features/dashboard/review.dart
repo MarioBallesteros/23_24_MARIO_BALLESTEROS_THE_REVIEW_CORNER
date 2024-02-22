@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// filtros de usuarios, busquedas, idiomas, ordenacion columnas
+// filtros de usuarios, busquedas, idiomas, ordenacion columnas
+// filtros de usuarios, busquedas, idiomas, ordenacion columnas
 class Review {
   final String reviewId;
   final String title;
@@ -7,8 +10,8 @@ class Review {
   final double rating;
   final String userId;
   final Timestamp creationDate;
+  final List<String> imageUrls;
 
-  // Asumiendo que estos son todos los campos que quieres mostrar en tu tabla
   static const int itemCount = 6;
 
   Review({
@@ -18,13 +21,12 @@ class Review {
     required this.rating,
     required this.userId,
     required this.creationDate,
+    required this.imageUrls,
   });
-
-
 
   // Método para crear una instancia de Review a partir de un documento de Firestore
   factory Review.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+      Map data = doc.data() as Map<String, dynamic>;
 
     return Review(
       reviewId: doc.id,
@@ -33,10 +35,10 @@ class Review {
       rating: data['rating'] ?? 0.0,
       userId: data['userId'] ?? '',
       creationDate: data['creationDate'] ?? Timestamp.now(),
+      imageUrls: List<String>.from(data['imageUrls'] ?? []),
     );
   }
 
-  // Método para obtener el encabezado de la columna basado en el índice
   static String getHeaderLabel(int index) {
     switch (index) {
       case 0:
@@ -70,7 +72,7 @@ class Review {
       case 4:
         return userId;
       case 5:
-        return creationDate.toDate().toString(); // Asumiendo que quieres mostrar la fecha como String
+        return creationDate.toDate().toString();
       default:
         return '';
     }
