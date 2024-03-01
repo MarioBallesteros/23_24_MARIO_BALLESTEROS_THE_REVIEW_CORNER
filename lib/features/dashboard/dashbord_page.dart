@@ -54,23 +54,12 @@ class DashBoardPage extends StatelessWidget {
       SummaryCard(title: 'KPI Progress Rate', value: '52.3%'),
     ];
 
-    return ContentView(
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ReviewPage(review: Review(
-              reviewId: '',
-              title: '',
-              reviewText: '',
-              rating: 0.0,
-              userId: '',
-              creationDate: Timestamp.now(), imageUrls: [],
-            ))),
-          );
-        },
+    // Envuelve ContentView en un Scaffold para incluir un FloatingActionButton
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard'),
       ),
-      child: Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const PageHeader(
@@ -92,6 +81,21 @@ class DashBoardPage extends StatelessWidget {
             child: _ReviewsView(),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ReviewPage(review: Review(
+              reviewId: '',
+              title: '',
+              reviewText: '',
+              rating: 0.0,
+              userId: '',
+              creationDate: Timestamp.now(), imageUrls: [],
+            ))),
+          );
+        },
       ),
     );
   }

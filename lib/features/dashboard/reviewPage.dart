@@ -36,24 +36,51 @@ class _ReviewPageState extends State<ReviewPage> {
   Future<void> _saveReview() async {
     try {
       final double rating = double.tryParse(_ratingController.text) ?? widget.review.rating;
-      await FirebaseFirestore.instance.collection('reviews').doc(widget.review.reviewId).update({
-        'title': _titleController.text,
-        'reviewText': _reviewTextController.text,
-        'rating': rating,
-      });
-      // Si la actualización es exitosa, muestra un toast de éxito
-      Fluttertoast.showToast(
-        msg: "Se ha actualizado correctamente",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.purple,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      String newReviewId;
+
+      if (widget.review.reviewId.isEmpty) {
+        // Obtener el total de documentos en la colección para generar un nuevo ID
+        final QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('reviews').get();
+        int totalDocuments = querySnapshot.docs.length;
+        newReviewId = (totalDocuments + 1).toString(); // Este es un enfoque básico y puede tener problemas en entornos concurrentes
+
+        // Crear un nuevo documento con un ID generado manualmente
+        await FirebaseFirestore.instance.collection('reviews').doc(newReviewId).set({
+          'title': _titleController.text,
+          'reviewText': _reviewTextController.text,
+          'rating': rating,
+          // Agrega cualquier otro campo necesario
+        });
+        Fluttertoast.showToast(
+          msg: "Reseña creada correctamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        // Actualizar un documento existente
+        await FirebaseFirestore.instance.collection('reviews').doc(widget.review.reviewId).update({
+          'title': _titleController.text,
+          'reviewText': _reviewTextController.text,
+          'rating': rating,
+          // Agrega cualquier otro campo necesario
+        });
+        Fluttertoast.showToast(
+          msg: "Reseña actualizada correctamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
       Navigator.of(context).pop(true); // Indica que se han realizado cambios
     } catch (e) {
-      // Si ocurre un error, muestra un toast de error
+      // Manejar errores
       Fluttertoast.showToast(
         msg: "Error: $e",
         toastLength: Toast.LENGTH_LONG,
@@ -66,12 +93,11 @@ class _ReviewPageState extends State<ReviewPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.review.reviewId.isEmpty ? 'Create Review' : 'Edit Review'),
+        title: Text(widget.review.reviewId.isEmpty ? 'Crear Reseña' : 'Editar Reseña'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -80,25 +106,26 @@ class _ReviewPageState extends State<ReviewPage> {
             children: [
               TextField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Título'),
               ),
               TextField(
                 controller: _reviewTextController,
-                decoration: InputDecoration(labelText: 'Review Text'),
+                decoration: const InputDecoration(labelText: 'Texto de la Reseña'),
                 maxLines: null, // Permite múltiples líneas
               ),
               TextField(
                 controller: _ratingController,
-                decoration: InputDecoration(labelText: 'Rating'),
+                decoration: const InputDecoration(labelText: 'Calificación'),
                 keyboardType: TextInputType.number, // Teclado numérico
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _saveReview,
+                child: const Text('Guardar Reseña'),
               ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _saveReview,
-        child: const Icon(Icons.save),
       ),
     );
   }
