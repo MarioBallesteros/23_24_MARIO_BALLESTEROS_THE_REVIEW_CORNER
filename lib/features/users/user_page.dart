@@ -1,71 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:thefluttercorner/features/users/user.dart';
+import 'package:thefluttercorner/features/users/Usuario.dart';
 
 class UserPage extends StatefulWidget {
-  const UserPage({super.key, required this.user});
+  final Usuario usuario;
 
-  final User user;
+  const UserPage({super.key, required this.usuario});
 
   @override
   _UserPageState createState() => _UserPageState();
 }
 
 class _UserPageState extends State<UserPage> {
-  late TextEditingController _nameController;
-  late TextEditingController _roleController;
+  late TextEditingController _nombreController;
+  late TextEditingController _contrasenyaController;
+  late TextEditingController _rolController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
-    _roleController = TextEditingController(text: widget.user.role);
+    _nombreController = TextEditingController(text: widget.usuario.nombre);
+    _contrasenyaController = TextEditingController(); // Asumiendo que no mostramos la contraseña
+    _rolController = TextEditingController(text: widget.usuario.rol);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _roleController.dispose();
+    _nombreController.dispose();
+    _contrasenyaController.dispose();
+    _rolController.dispose();
     super.dispose();
   }
 
-  Future<String> _getAvailableCustomDocumentId() async {
-    // Esta función es solo un ejemplo y puede no ser eficiente o segura para concurrencias
-    final collectionRef = FirebaseFirestore.instance.collection('users');
-    const startId = 1; // Comenzamos a buscar desde el ID 1
-    bool isAvailable = false;
-    int currentId = startId;
+  Future<void> _saveUsuario() async {
+    final String nombre = _nombreController.text.trim();
+    final String contrasenya = _contrasenyaController.text.trim(); // Asumiendo que quieres guardar/actualizar la contraseña
+    final String rol = _rolController.text.trim();
 
-    while (!isAvailable) {
-      final docSnapshot = await collectionRef.doc(currentId.toString()).get();
-      if (!docSnapshot.exists) {
-        isAvailable = true; // El ID actual está disponible
-      } else {
-        currentId++; // Incrementa el ID y verifica el siguiente
-      }
-    }
-
-    return currentId.toString(); // Retorna el primer ID disponible como string
-  }
-
-  Future<void> _saveUser() async {
-    final String name = _nameController.text.trim();
-    final String role = _roleController.text.trim();
-
-    if (name.isNotEmpty && role.isNotEmpty) {
-      if (widget.user.userId.isEmpty) {
-        // Obtén el primer ID disponible
-        String customDocumentId = await _getAvailableCustomDocumentId();
-        // Usa este ID para el nuevo documento
-        await FirebaseFirestore.instance.collection('users').doc(customDocumentId).set({
-          'name': name,
-          'role': role,
+    if (nombre.isNotEmpty && rol.isNotEmpty) {
+      String usuarioId = widget.usuario.usuarioId;
+      if (usuarioId.isEmpty) {
+        // Crear un nuevo usuario
+        DocumentReference docRef = await FirebaseFirestore.instance.collection('users').add({
+          'nombre': nombre,
+          'contrasenya': contrasenya, // Considera la seguridad de almacenar contraseñas
+          'rol': rol,
         });
+        usuarioId = docRef.id; // Obtener el ID del nuevo documento
       } else {
         // Actualizar un usuario existente
-        await FirebaseFirestore.instance.collection('users').doc(widget.user.userId).update({
-          'name': name,
-          'role': role,
+        await FirebaseFirestore.instance.collection('users').doc(usuarioId).update({
+          'nombre': nombre,
+          'contrasenya': contrasenya,
+          'rol': rol,
         });
       }
 
@@ -73,80 +60,51 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  Future<void> _deleteUser() async {
-    final bool confirmDelete = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar'),
-          content: const Text('¿Estás seguro de que quieres eliminar este usuario?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
-
-    if (confirmDelete) {
-      if (widget.user.userId.isNotEmpty) {
-        // Eliminar el usuario de Firestore
-        await FirebaseFirestore.instance.collection('users').doc(widget.user.userId).delete();
-        Navigator.of(context).pop(); // Regresa a la pantalla anterior después de eliminar
-      }
+  Future<void> _deleteUsuario() async {
+    // Similar a _deleteUser pero utilizando el campo `usuarioId`
+    if (widget.usuario.usuarioId.isNotEmpty) {
+      await FirebaseFirestore.instance.collection('users').doc(widget.usuario.usuarioId).delete();
+      Navigator.of(context).pop(); // Regresa a la pantalla anterior después de eliminar
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.user.userId.isEmpty ? 'Create User' : 'Edit User'),
+        title: Text(widget.usuario.usuarioId.isEmpty ? 'Crear Usuario' : 'Editar Usuario'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              controller: _nombreController,
+              decoration: const InputDecoration(labelText: 'Nombre'),
             ),
             TextField(
-              controller: _roleController,
-              decoration: const InputDecoration(labelText: 'Role'),
+              controller: _contrasenyaController,
+              decoration: const InputDecoration(labelText: 'Contraseña'),
+              obscureText: true,
             ),
-            // Si necesitas un botón "Guardar" dentro del cuerpo, muévelo aquí.
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked, // Ubica el FAB principal en la esquina inferior derecha
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left: 34.0,bottom: 30.0), // Ajusta este valor según necesites
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Alinea los botones a los extremos
-          children: <Widget>[
-            if (widget.user.userId.isNotEmpty) // Muestra el botón de eliminar solo si es un usuario existente
-              FloatingActionButton(
-                heroTag: "btn1",
-                onPressed: _deleteUser,
-                child: const Icon(Icons.delete),
-                backgroundColor: Colors.red,
-              ),
-            FloatingActionButton(
-              heroTag: "btn2",
-              onPressed: _saveUser,
-              child: const Icon(Icons.save),
+            TextField(
+              controller: _rolController,
+              decoration: const InputDecoration(labelText: 'Rol'),
+            ),
+            ElevatedButton(
+              onPressed: _saveUsuario,
+              child: const Text('Guardar'),
             ),
           ],
         ),
       ),
+      floatingActionButton: widget.usuario.usuarioId.isNotEmpty
+          ? FloatingActionButton(
+        onPressed: _deleteUsuario,
+        child: const Icon(Icons.delete),
+        backgroundColor: Colors.red,
+      )
+          : null,
     );
   }
 }

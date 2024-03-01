@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:thefluttercorner/LoginScreen.dart';
 import 'package:thefluttercorner/features/users/user_not_found_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thefluttercorner/widgets/navigation/scaffold_with_navigation.dart';
 
 import 'features/dashboard/dashbord_page.dart';
-import 'features/users/dummy_users.dart';
 import 'features/users/user_page.dart';
 import 'features/users/users_page.dart';
 
@@ -39,7 +39,11 @@ final router = GoRouter(
             ),
           ],
         ),
+        TypedGoRoute<LoginPageRoute>(
+          path: routerInitialLocation,
+        ),
       ],
+
     ),
   ],
 )
@@ -78,16 +82,18 @@ class UsersPageRoute extends GoRouteData {
   }
 }
 
+class LoginPageRoute extends GoRouteData {
+  const LoginPageRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const LoginScreen();
+  }
+}
+
 class UserPageRoute extends GoRouteData {
   const UserPageRoute({required this.userId});
 
   final String userId;
 
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    final user = dummyUsers.firstWhereOrNull((e) => e.userId == userId);
-    return user == null
-        ? UserNotFoundPage(userId: userId)
-        : UserPage(user: user);
-  }
 }

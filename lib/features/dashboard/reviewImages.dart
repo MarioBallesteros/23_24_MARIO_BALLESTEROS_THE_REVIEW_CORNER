@@ -7,25 +7,25 @@ class ReviewImages extends StatelessWidget {
   const ReviewImages({Key? key, required this.reviewId}) : super(key: key);
 
   Future<List<String>> _fetchImageUrls() async {
+    List<String> imageUrls = [];
     try {
       print('Fetching images for review ID: $reviewId');
+      // Intenta listar todos los archivos dentro de la carpeta correspondiente al reviewId
       final ListResult result = await FirebaseStorage.instance
           .ref('imagenesReview/$reviewId')
           .listAll();
 
-      List<String> imageUrls = [];
+      // Para cada referencia de archivo en el resultado, obtén la URL de descarga
       for (var ref in result.items) {
         final String url = await ref.getDownloadURL();
+        imageUrls.add(url); // Añade la URL a la lista de URLs de imágenes
         print('Found image URL: $url');
-        imageUrls.add(url);
       }
-
       print('Total images found: ${imageUrls.length}');
-      return imageUrls;
     } catch (e) {
       print('Error fetching images: $e');
-      return [];
     }
+    return imageUrls; // Devuelve la lista de URLs de imágenes
   }
 
   @override
@@ -44,6 +44,7 @@ class ReviewImages extends StatelessWidget {
           return Center(child: Text("No images found"));
         }
 
+        // Si hay datos, muestra las imágenes en una fila horizontal
         final imageUrls = snapshot.data!;
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,

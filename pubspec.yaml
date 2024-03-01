@@ -10,6 +10,7 @@ dependencies:
   firebase_core: ^2.25.2
   cloud_firestore: 4.15.4
   firebase_storage: ^11.6.6
+  fluttertoast: ^8.0.8
   adaptive_theme:
   collection:
   cupertino_icons:

@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:thefluttercorner/LoginScreen.dart';
 import 'package:thefluttercorner/theme.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -19,7 +20,7 @@ void main() async {
 class App extends StatelessWidget {
   const App({super.key});
 
-  static const title = 'Flutter Admin Dashboard';
+  static const title = 'The Flutter Corner';
 
   @override
   Widget build(BuildContext context) {

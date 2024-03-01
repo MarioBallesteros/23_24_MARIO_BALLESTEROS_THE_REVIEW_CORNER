@@ -8,8 +8,8 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import '../../widgets/widgets.dart';
 import 'package:thefluttercorner/features/dashboard/review.dart';
-
 import 'ReviewDetailsPage.dart';
+
 
 class DashBoardPage extends StatelessWidget {
   const DashBoardPage({Key? key}) : super(key: key);
@@ -17,9 +17,40 @@ class DashBoardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveBreakpoints.of(context);
-    const summaryCards = [
-      SummaryCard(title: 'Total Sales', value: '\$125,000'),
-      SummaryCard(title: 'Total Users', value: '12,000'),
+
+    // Usar un FutureBuilder para obtener el conteo de reseñas en tiempo real
+    Widget totalReviewsCard = FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance.collection('reviews').get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SummaryCard(title: 'Total Reviews', value: 'Loading...');
+        }
+        if (snapshot.hasError) {
+          return SummaryCard(title: 'Total Reviews', value: 'Error');
+        }
+        final totalReviews = snapshot.data?.docs.length.toString() ?? '0';
+        return SummaryCard(title: 'Total Reviews', value: totalReviews);
+      },
+    );
+
+    // Widget para obtener el total de usuarios
+    Widget totalUsersCard = FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance.collection('users').get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SummaryCard(title: 'Total Users', value: 'Loading...');
+        }
+        if (snapshot.hasError) {
+          return SummaryCard(title: 'Total Users', value: 'Error');
+        }
+        final totalUsers = snapshot.data?.docs.length.toString() ?? '0';
+        return SummaryCard(title: 'Total Users', value: totalUsers);
+      },
+    );
+
+    final summaryCards = [
+      totalReviewsCard,
+      totalUsersCard,
       SummaryCard(title: 'KPI Progress Rate', value: '52.3%'),
     ];
 
@@ -44,7 +75,7 @@ class DashBoardPage extends StatelessWidget {
         children: [
           const PageHeader(
             title: 'Dashboard',
-            description: 'A summary of key data and insights on your project.',
+            description: '',
           ),
           const Gap(16),
           if (responsive.isMobile)

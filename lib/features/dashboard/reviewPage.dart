@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:thefluttercorner/features/dashboard/review.dart';
 
 class ReviewPage extends StatefulWidget {
@@ -14,8 +15,7 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   late TextEditingController _titleController;
   late TextEditingController _reviewTextController;
-  late TextEditingController _ratingController; // Asegúrate de manejar correctamente el tipo de dato
-  // Considera agregar controladores para los demás campos según sea necesario
+  late TextEditingController _ratingController;
 
   @override
   void initState() {
@@ -23,7 +23,6 @@ class _ReviewPageState extends State<ReviewPage> {
     _titleController = TextEditingController(text: widget.review.title);
     _reviewTextController = TextEditingController(text: widget.review.reviewText);
     _ratingController = TextEditingController(text: widget.review.rating.toString());
-    // Inicializa los demás controladores aquí
   }
 
   @override
@@ -31,18 +30,45 @@ class _ReviewPageState extends State<ReviewPage> {
     _titleController.dispose();
     _reviewTextController.dispose();
     _ratingController.dispose();
-    // Dispone los demás controladores aquí
     super.dispose();
   }
 
   Future<void> _saveReview() async {
-    // Aquí implementarías la lógica para guardar o actualizar la reseña
-    // Similar a _saveUser, pero adaptado para reseñas
+    try {
+      final double rating = double.tryParse(_ratingController.text) ?? widget.review.rating;
+      await FirebaseFirestore.instance.collection('reviews').doc(widget.review.reviewId).update({
+        'title': _titleController.text,
+        'reviewText': _reviewTextController.text,
+        'rating': rating,
+      });
+      // Si la actualización es exitosa, muestra un toast de éxito
+      Fluttertoast.showToast(
+        msg: "Se ha actualizado correctamente",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.purple,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      Navigator.of(context).pop(true); // Indica que se han realizado cambios
+    } catch (e) {
+      // Si ocurre un error, muestra un toast de error
+      Fluttertoast.showToast(
+        msg: "Error: $e",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
-    // Construye la UI para la página de edición/creación de reseñas
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.review.reviewId.isEmpty ? 'Create Review' : 'Edit Review'),
@@ -52,8 +78,20 @@ class _ReviewPageState extends State<ReviewPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Campos de texto para editar los atributos de la reseña
-              // Botón para guardar los cambios
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: _reviewTextController,
+                decoration: InputDecoration(labelText: 'Review Text'),
+                maxLines: null, // Permite múltiples líneas
+              ),
+              TextField(
+                controller: _ratingController,
+                decoration: InputDecoration(labelText: 'Rating'),
+                keyboardType: TextInputType.number, // Teclado numérico
+              ),
             ],
           ),
         ),
