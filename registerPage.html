@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>The Review Corner</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+   	<!--favicon-->
+	<link rel="icon" href="imagenes/logo.png" type="image/png" />
+	<!-- MATERIAL DESIGN ICONIC FONT -->
+	<link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.css">
+
+	<!-- BOOSTSTRAP -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+
+	<!-- STYLE CSS -->
+	<link rel="stylesheet" href="css/registerCss.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/css.css">
+</head>
+
+<body>
+	<div class="wrapper">
+		<form action="" id="wizard">
+			<!-- SECTION 1 -->
+			<h2></h2>
+			<section>
+				<div class="inner">
+					<div class="image-holder">
+						<img src="imagenes/registro/registro1.png" alt="">
+					</div>
+					<div class="form-content">
+						<div class="form-header">
+							<h3>Registro</h3>
+						</div>
+						<p>Porfavor, rellena tus datos</p>
+						<div class="form-row">
+							<div class="form-holder">
+								<input type="text" placeholder="Nombre" class="form-control">
+							</div>
+							<div class="form-holder">
+								<input type="text" placeholder="Apellidos" class="form-control">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-holder">
+								<input type="text" placeholder="Correo Electrónico" class="form-control">
+							</div>
+							<div class="form-holder">
+								<input type="text" placeholder="Teléfono" class="form-control">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-holder">
+								<input type="text" placeholder="Edad" class="form-control">
+							</div>
+							<div class="form-holder" style="align-self: flex-end; transform: translateY(4px);">
+								<div class="checkbox-tick">
+									<label class="male">
+										<input type="radio" name="gender" value="male" checked> Hombre<br>
+										<span class="checkmark"></span>
+									</label>
+									<label class="female">
+										<input type="radio" name="gender" value="female"> Mujer<br>
+										<span class="checkmark"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- SECTION 2 -->
+			<h2></h2>
+			<section>
+				<div class="inner">
+					<div class="image-holder">
+						<img src="imagenes/registro/registro2.png" alt="">
+					</div>
+					<div class="form-content">
+						<div class="form-header">
+							<h3>Registro</h3>
+						</div>
+						<p>Porfavor termina de completar la información</p>
+						<div class="form-row">
+							<div class="form-holder w-100">
+								<input type="text" placeholder="Direccion" class="form-control">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-holder">
+								<input type="text" placeholder="Ciudad" class="form-control">
+							</div>
+							<div class="form-holder">
+								<input type="text" placeholder="Codigo Postal" class="form-control">
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="select">
+								<div class="form-holder">
+									<div class="select-control">Tu Ciudad</div>
+									<i class="zmdi zmdi-caret-down"></i>
+								</div>
+								<ul class="dropdown">
+									<li rel="España">España</li>
+									<li rel="Argentina">Argentina</li>
+									<li rel="Colombia">Colombia</li>
+								</ul>
+							</div>
+							<div class="form-holder"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- SECTION 3 -->
+			<h2></h2>
+			<section>
+				<div class="inner">
+					<div class="image-holder">
+						<img src="imagenes/registro/registro3.png" alt="">
+					</div>
+					<div class="form-content">
+						<div class="form-header">
+							<h3>Registro</h3>
+						</div>
+						<p>Escribe una Descripción De Tu Perfil</p>
+						<div class="form-row">
+							<div class="form-holder w-100">
+								<textarea name="" id="" placeholder="Escribe un poco de ti!" class="form-control"
+									style="height: 99px;"></textarea>
+							</div>
+						</div>
+						<div class="checkbox-circle mt-24">
+							<label>
+								<input type="checkbox" checked> Aceptas los <a href="#">Terminos y Condiciones ?</a>
+								<span class="checkmark"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</section>
+		</form>
+	</div>
+
+	<!-- JQUERY -->
+	<script src="js/jquery-3.3.1.min.js"></script>
+
+	<!-- JQUERY STEP -->
+	<script src="js/jquery.steps.js"></script>
+	<script src="js/main.js"></script>
+</body>
+</html>

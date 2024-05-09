@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>PRODUCTO</title>
+    <!--favicon-->
+    <link rel="icon" href="imagenes/logo.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/cssProduct.css" />
+    <link rel="stylesheet" href="https://allyoucan.cloud/cdn/icofont/1.0.1/icofont.css"
+        integrity="sha384-jbCTJB16Q17718YM9U22iJkhuGbS0Gd2LjaWb4YJEZToOPmnKDjySVa323U+W7Fv" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/css.css" />
+    <link rel="stylesheet" type="text/css" href="css/component.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/cssNewProduct/app.css" />
+    <link rel="stylesheet" href="./css/cssProduct.css" />
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
+            authDomain: "the-review-corner.firebaseapp.com",
+            projectId: "the-review-corner",
+            storageBucket: "the-review-corner.appspot.com",
+            messagingSenderId: "639567467813",
+            appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
+            measurementId: "G-MEL1Z69T4M"
+        };
+
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadProduct() {
+            // Obtener el ID del producto y el nombre de la categoría desde la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoria = urlParams.get('categoria');
+            const subcategoria = urlParams.get('subcategoria');
+            const productId = urlParams.get('id');
+
+            if (!categoria || !subcategoria || !productId) {
+                console.error('Categoría, subcategoría o ID del producto no proporcionados');
+                return;
+            }
+
+            // Referencia al documento del producto
+            const productDocRef = doc(db, `categoria/${categoria}/subcategorias/${subcategoria}/productos`, productId);
+
+            try {
+                const productDoc = await getDoc(productDocRef);
+
+                if (!productDoc.exists()) {
+                    console.error(`Producto no encontrado: ${categoria}/${subcategoria}/${productId}`);
+                    alert('Producto no encontrado');
+                    return;
+                }
+
+                const product = productDoc.data();
+
+                // Actualizar el contenido de la página con los datos del producto
+                document.getElementById('producto-nombre').textContent = product.nombre || 'Producto Desconocido';
+                document.getElementById('producto-fabricante').textContent = product.fabricante || 'Fabricante Desconocido';
+                document.getElementById('producto-votos').textContent = product.votos || 0;
+                document.getElementById('producto-precio').textContent = `$${product.precio}` || 'Precio Desconocido';
+                document.getElementById('producto-descripcion').textContent = product.descripcion || 'Descripción no disponible';
+                document.getElementById('producto-sistema-operativo').textContent = product.sistemaOperativo || 'N/A';
+                document.getElementById('producto-procesador').textContent = product.procesador || 'N/A';
+                document.getElementById('producto-pantalla').textContent = product.pantalla || 'N/A';
+                document.getElementById('producto-ram').textContent = product.ram || 'N/A';
+                document.getElementById('producto-almacenamiento').textContent = product.almacenamiento || 'N/A';
+                document.getElementById('producto-tarjeta-grafica').textContent = product.tarjetaGrafica || 'N/A';
+
+                // Establecer las imágenes
+                document.getElementById('producto-imagen1').src = product.imagenes?.[0] || 'imagenes/productos/default.jpg';
+                document.getElementById('producto-imagen2').src = product.imagenes?.[1] || 'imagenes/productos/default.jpg';
+                document.getElementById('producto-imagen3').src = product.imagenes?.[2] || 'imagenes/productos/default.jpg';
+
+                document.getElementById('producto-precio-amazon').textContent = product.precioAmazon || '0.00';
+
+            } catch (error) {
+                console.error('Error al obtener los datos del producto:', error);
+                alert('Error al cargar el producto.');
+            }
+        }
+
+        // Ejecutar la función para cargar el producto
+        document.addEventListener('DOMContentLoaded', loadProduct);
+    </script>
+
+</head>
+
+<body>
+    <header>
+        <section id="navar-section">
+            <nav class="navbar navbar-expand-lg fixed-top menu menu--viola">
+                <div class="container">
+                    <a class="navbar-brand" href="#"><img class="logoHeaderProduct" src="./imagenes/logo.png" /></a>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a href="index.html"
+                                    class="botonVolver nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">
+                                    <i class="fas fa-arrow-left me-2"></i> Volver
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </section>
+    </header>
+
+    <br><br><br>
+    <div class="container">
+        <div class="product-content product-wrap clearfix product-deatil">
+            <div class="row">
+                <div class="col-md-5 col-sm-12 col-xs-12">
+                    <div class="product-image">
+                        <div id="myCarousel-2" class="carousel slide">
+                            <ol class="carousel-indicators">
+                                <li data-target="#myCarousel-2" data-slide-to="0" class></li>
+                                <li data-target="#myCarousel-2" data-slide-to="1" class="active"></li>
+                                <li data-target="#myCarousel-2" data-slide-to="2" class></li>
+                            </ol>
+                            <div class="carousel-inner">
+
+                                <div class="item active imagenProducto">
+                                    <img id="producto-imagen1" class="img-responsive" alt />
+                                </div>
+
+                                <div class="item imagenProducto">
+                                    <img id="producto-imagen2" class="img-responsive" alt />
+                                </div>
+
+                                <div class="item imagenProducto">
+                                    <img id="producto-imagen3" class="img-responsive" alt />
+                                </div>
+                            </div>
+                            <a class="left carousel-control" href="#myCarousel-2" data-slide="prev"> <span
+                                    class="glyphicon glyphicon-chevron-left"></span> </a>
+                            <a class="right carousel-control" href="#myCarousel-2" data-slide="next"> <span
+                                    class="glyphicon glyphicon-chevron-right"></span> </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
+                    <h2 class="name">
+                        <span id="producto-nombre"></span>
+                        <small>Product by <span id="producto-fabricante"></span></small>
+                        <i class="fa fa-star fa-2x text-primary"></i>
+                        <i class="fa fa-star fa-2x text-primary"></i>
+                        <i class="fa fa-star fa-2x text-primary"></i>
+                        <i class="fa fa-star fa-2x text-primary"></i>
+                        <i class="fa fa-star fa-2x text-muted"></i>
+                        <span class="fa fa-2x">
+                            <h5>(<span id="producto-votos"></span>) Votes</h5>
+                        </span>
+                        <a href="javascript:void(0);">109 customer reviews</a>
+                    </h2>
+                    <hr />
+                    <h3 class="price-container">
+                        <span id="producto-precio"></span>
+                        <small>*includes tax</small>
+                    </h3>
+                    <div class="certified">
+                        <ul>
+                            <li>
+                                <a href="javascript:void(0);">Plazo Entrega<span>/7 días hábiles </span></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">Certificado<span>Calidad Asegurada</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr />
+                    <div class="description description-tabs">
+                        <ul id="myTab" class="nav nav-pills">
+                            <li class="active"><a href="#more-information" data-toggle="tab" class="no-margin">
+                                    Descripción Producto </a></li>
+                            <li class><a href="#specifications" data-toggle="tab">Especificaciones Técnicas</a></li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane fade active in" id="more-information">
+                                <br />
+                                <strong>Descripción</strong>
+                                <p id="producto-descripcion"></p>
+                            </div>
+                            <div class="tab-pane fade" id="specifications">
+                                <br />
+                                <dl>
+                                    <dt>Sistema operativo</dt>
+                                    <dd id="producto-sistema-operativo"></dd>
+
+                                    <dt>Procesador</dt>
+                                    <dd id="producto-procesador"></dd>
+
+                                    <dt>Pantalla</dt>
+                                    <dd id="producto-pantalla"></dd>
+
+                                    <dt>Memoria RAM</dt>
+                                    <dd id="producto-ram"></dd>
+
+                                    <dt>Almacenamiento</dt>
+                                    <dd id="producto-almacenamiento"></dd>
+
+                                    <dt>Tarjeta gráfica</dt>
+                                    <dd id="producto-tarjeta-grafica"></dd>
+                                </dl>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <a href="javascript:void(0);" class="btn btn-success btn-lg">Comprar Amazon (<span id="producto-precio-amazon"></span>€)</a>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-white btn-default"><i class="fa fa-star"></i> Añadir a Lista de Deseos</button>
+                                <button class="btn btn-white btn-default"><i class="fa fa-envelope"></i> Contactar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</body>
+
+</html>
