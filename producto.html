@@ -11,14 +11,19 @@
     <link rel="stylesheet" type="text/css" href="css/cssProduct.css" />
     <link rel="stylesheet" href="https://allyoucan.cloud/cdn/icofont/1.0.1/icofont.css"
         integrity="sha384-jbCTJB16Q17718YM9U22iJkhuGbS0Gd2LjaWb4YJEZToOPmnKDjySVa323U+W7Fv" crossorigin="anonymous">
+
     <link rel="stylesheet" type="text/css" href="css/css.css" />
     <link rel="stylesheet" type="text/css" href="css/component.css" />
+    <!-- Bootstrap CDN Link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+    <!-- Fontawesome CDN Link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
         integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS Link -->
     <link rel="stylesheet" href="./css/style.css" />
+    <!-- CSS New Product (Fondo y header bien) -->
     <link rel="stylesheet" href="./css/cssNewProduct/app.css" />
     <link rel="stylesheet" href="./css/cssProduct.css" />
 
@@ -71,21 +76,37 @@
                 document.getElementById('producto-nombre').textContent = product.nombre || 'Producto Desconocido';
                 document.getElementById('producto-fabricante').textContent = product.fabricante || 'Fabricante Desconocido';
                 document.getElementById('producto-votos').textContent = product.votos || 0;
-                document.getElementById('producto-precio').textContent = `$${product.precio}` || 'Precio Desconocido';
+                document.getElementById('producto-precio').textContent = `${product.precio ?? 'Precio Desconocido'}€`;
                 document.getElementById('producto-descripcion').textContent = product.descripcion || 'Descripción no disponible';
-                document.getElementById('producto-sistema-operativo').textContent = product.sistemaOperativo || 'N/A';
-                document.getElementById('producto-procesador').textContent = product.procesador || 'N/A';
-                document.getElementById('producto-pantalla').textContent = product.pantalla || 'N/A';
-                document.getElementById('producto-ram').textContent = product.ram || 'N/A';
-                document.getElementById('producto-almacenamiento').textContent = product.almacenamiento || 'N/A';
-                document.getElementById('producto-tarjeta-grafica').textContent = product.tarjetaGrafica || 'N/A';
+                document.getElementById('producto-precio-amazon').textContent = product.precioAmazon || '0.00';
 
                 // Establecer las imágenes
                 document.getElementById('producto-imagen1').src = product.imagenes?.[0] || 'imagenes/productos/default.jpg';
                 document.getElementById('producto-imagen2').src = product.imagenes?.[1] || 'imagenes/productos/default.jpg';
                 document.getElementById('producto-imagen3').src = product.imagenes?.[2] || 'imagenes/productos/default.jpg';
 
-                document.getElementById('producto-precio-amazon').textContent = product.precioAmazon || '0.00';
+                // Mostrar solo las características disponibles dinámicamente
+                const especificaciones = document.getElementById('specifications-list');
+                especificaciones.innerHTML = '';
+
+                const atributos = {
+                    'Sistema operativo': product.sistemaOperativo,
+                    'Procesador': product.procesador,
+                    'Pantalla': product.pantalla,
+                    'Memoria RAM': product.ram,
+                    'Almacenamiento': product.almacenamiento,
+                    'Tarjeta gráfica': product.tarjetaGrafica,
+                    // Agrega más atributos si es necesario
+                };
+
+                for (const [atributo, valor] of Object.entries(atributos)) {
+                    if (valor) {
+                        especificaciones.innerHTML += `
+                            <dt>${atributo}</dt>
+                            <dd>${valor}</dd>
+                        `;
+                    }
+                }
 
             } catch (error) {
                 console.error('Error al obtener los datos del producto:', error);
@@ -101,6 +122,7 @@
 
 <body>
     <header>
+        <!-- Navar Starts -->
         <section id="navar-section">
             <nav class="navbar navbar-expand-lg fixed-top menu menu--viola">
                 <div class="container">
@@ -118,8 +140,8 @@
                 </div>
             </nav>
         </section>
+        <!-- Navar Ended -->
     </header>
-
     <br><br><br>
     <div class="container">
         <div class="product-content product-wrap clearfix product-deatil">
@@ -133,15 +155,12 @@
                                 <li data-target="#myCarousel-2" data-slide-to="2" class></li>
                             </ol>
                             <div class="carousel-inner">
-
                                 <div class="item active imagenProducto">
                                     <img id="producto-imagen1" class="img-responsive" alt />
                                 </div>
-
                                 <div class="item imagenProducto">
                                     <img id="producto-imagen2" class="img-responsive" alt />
                                 </div>
-
                                 <div class="item imagenProducto">
                                     <img id="producto-imagen3" class="img-responsive" alt />
                                 </div>
@@ -197,27 +216,8 @@
                             </div>
                             <div class="tab-pane fade" id="specifications">
                                 <br />
-                                <dl>
-                                    <dt>Sistema operativo</dt>
-                                    <dd id="producto-sistema-operativo"></dd>
-
-                                    <dt>Procesador</dt>
-                                    <dd id="producto-procesador"></dd>
-
-                                    <dt>Pantalla</dt>
-                                    <dd id="producto-pantalla"></dd>
-
-                                    <dt>Memoria RAM</dt>
-                                    <dd id="producto-ram"></dd>
-
-                                    <dt>Almacenamiento</dt>
-                                    <dd id="producto-almacenamiento"></dd>
-
-                                    <dt>Tarjeta gráfica</dt>
-                                    <dd id="producto-tarjeta-grafica"></dd>
-                                </dl>
+                                <dl id="specifications-list"></dl>
                             </div>
-
                         </div>
                     </div>
                     <hr />
@@ -239,6 +239,7 @@
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>
