@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <title>PRODUCTO</title>
     <!--favicon-->
-    <link rel="icon" href="imagenes/logo.png" type="image/png" />
+	<link rel="icon" href="imagenes/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/cssProduct.css" />
@@ -27,97 +27,40 @@
     <link rel="stylesheet" href="./css/cssNewProduct/app.css" />
     <link rel="stylesheet" href="./css/cssProduct.css" />
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
-            authDomain: "the-review-corner.firebaseapp.com",
-            projectId: "the-review-corner",
-            storageBucket: "the-review-corner.appspot.com",
-            messagingSenderId: "639567467813",
-            appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
-            measurementId: "G-MEL1Z69T4M"
-        };
-
-        // Inicializa Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function loadProduct() {
-            // Obtener el ID del producto y el nombre de la categoría desde la URL
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Use URLSearchParams to handle query parameters
             const urlParams = new URLSearchParams(window.location.search);
             const categoria = urlParams.get('categoria');
-            const subcategoria = urlParams.get('subcategoria');
-            const productId = urlParams.get('id');
-
-            if (!categoria || !subcategoria || !productId) {
-                console.error('Categoría, subcategoría o ID del producto no proporcionados');
+            const id = urlParams.get('id');
+        
+            if (!categoria || !id) {
+                console.error('Missing category or product ID');
+                alert('Missing necessary query parameters.');
                 return;
             }
-
-            // Referencia al documento del producto
-            const productDocRef = doc(db, `categoria/${categoria}/subcategorias/${subcategoria}/productos`, productId);
-
-            try {
-                const productDoc = await getDoc(productDocRef);
-
-                if (!productDoc.exists()) {
-                    console.error(`Producto no encontrado: ${categoria}/${subcategoria}/${productId}`);
-                    alert('Producto no encontrado');
-                    return;
+        
+            // Fetch product details
+            fetch(`/categoria/${encodeURIComponent(categoria)}/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
                 }
-
-                const product = productDoc.data();
-
-                // Actualizar el contenido de la página con los datos del producto
-                document.getElementById('producto-nombre').textContent = product.nombre || 'Producto Desconocido';
-                document.getElementById('producto-fabricante').textContent = product.fabricante || 'Fabricante Desconocido';
-                document.getElementById('producto-votos').textContent = product.votos || 0;
-                document.getElementById('producto-precio').textContent = `${product.precio ?? 'Precio Desconocido'}€`;
-                document.getElementById('producto-descripcion').textContent = product.descripcion || 'Descripción no disponible';
-                document.getElementById('producto-precio-amazon').textContent = product.precioAmazon || '0.00';
-
-                // Establecer las imágenes
-                document.getElementById('producto-imagen1').src = product.imagenes?.[0] || 'imagenes/productos/default.jpg';
-                document.getElementById('producto-imagen2').src = product.imagenes?.[1] || 'imagenes/productos/default.jpg';
-                document.getElementById('producto-imagen3').src = product.imagenes?.[2] || 'imagenes/productos/default.jpg';
-
-                // Mostrar solo las características disponibles dinámicamente
-                const especificaciones = document.getElementById('specifications-list');
-                especificaciones.innerHTML = '';
-
-                const atributos = {
-                    'Sistema operativo': product.sistemaOperativo,
-                    'Procesador': product.procesador,
-                    'Pantalla': product.pantalla,
-                    'Memoria RAM': product.ram,
-                    'Almacenamiento': product.almacenamiento,
-                    'Tarjeta gráfica': product.tarjetaGrafica,
-                    // Agrega más atributos si es necesario
-                };
-
-                for (const [atributo, valor] of Object.entries(atributos)) {
-                    if (valor) {
-                        especificaciones.innerHTML += `
-                            <dt>${atributo}</dt>
-                            <dd>${valor}</dd>
-                        `;
-                    }
-                }
-
-            } catch (error) {
-                console.error('Error al obtener los datos del producto:', error);
-                alert('Error al cargar el producto.');
-            }
-        }
-
-        // Ejecutar la función para cargar el producto
-        document.addEventListener('DOMContentLoaded', loadProduct);
-    </script>
-
+                return response.json();
+            })
+            .then(data => {
+                // Example: Update the webpage content with fetched data
+                document.getElementById('product-name').textContent = data.name;
+                document.getElementById('product-description').textContent = data.description;
+                document.getElementById('product-price').textContent = `$${data.price}`;
+                // Continue updating other elements as needed
+            })
+            .catch(error => {
+                console.error('Error loading the product data:', error);
+                alert('Failed to load product details.');
+            });
+        });
+        </script>
 </head>
 
 <body>
@@ -141,6 +84,7 @@
             </nav>
         </section>
         <!-- Navar Ended -->
+
     </header>
     <br><br><br>
     <div class="container">
@@ -155,14 +99,17 @@
                                 <li data-target="#myCarousel-2" data-slide-to="2" class></li>
                             </ol>
                             <div class="carousel-inner">
+
                                 <div class="item active imagenProducto">
-                                    <img id="producto-imagen1" class="img-responsive" alt />
+                                    <img src="imagenes/productos/portatil2.jpg" class="img-responsive" alt />
                                 </div>
+
                                 <div class="item imagenProducto">
-                                    <img id="producto-imagen2" class="img-responsive" alt />
+                                    <img src="imagenes/productos/portatil3.jpg" class="img-responsive" alt />
                                 </div>
+
                                 <div class="item imagenProducto">
-                                    <img id="producto-imagen3" class="img-responsive" alt />
+                                    <img src="imagenes/productos/portatil4.jpg" class="img-responsive" alt />
                                 </div>
                             </div>
                             <a class="left carousel-control" href="#myCarousel-2" data-slide="prev"> <span
@@ -174,21 +121,21 @@
                 </div>
                 <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
                     <h2 class="name">
-                        <span id="producto-nombre"></span>
-                        <small>Product by <span id="producto-fabricante"></span></small>
+                        Portátil gaming Acer Nitro V 15
+                        <small>Product by <a href="javascript:void(0);">Adeline</a></small>
                         <i class="fa fa-star fa-2x text-primary"></i>
                         <i class="fa fa-star fa-2x text-primary"></i>
                         <i class="fa fa-star fa-2x text-primary"></i>
                         <i class="fa fa-star fa-2x text-primary"></i>
                         <i class="fa fa-star fa-2x text-muted"></i>
                         <span class="fa fa-2x">
-                            <h5>(<span id="producto-votos"></span>) Votes</h5>
+                            <h5>(109) Votes</h5>
                         </span>
                         <a href="javascript:void(0);">109 customer reviews</a>
                     </h2>
                     <hr />
                     <h3 class="price-container">
-                        <span id="producto-precio"></span>
+                        $129.54
                         <small>*includes tax</small>
                     </h3>
                     <div class="certified">
@@ -212,18 +159,43 @@
                             <div class="tab-pane fade active in" id="more-information">
                                 <br />
                                 <strong>Descripción</strong>
-                                <p id="producto-descripcion"></p>
+                                <p>
+                                    Este nuevo portátil Acer Nitro V 15, equipado con Windows 11, mejora su rendimiento
+                                    gracias a la disponibilidad de hasta 32 GB de memoria DRR5 y soporte para hasta 2 TB
+                                    de almacenamiento en estado sólido M.2 PCIe. Esto proporciona un arranque rápido y
+                                    mucho espacio disponible para aplicaciones, archivos y juegos. Garantizando que Acer
+                                    Nitro V 15 esté optimizado durante largas sesiones de juego.
+                                </p>
                             </div>
                             <div class="tab-pane fade" id="specifications">
                                 <br />
-                                <dl id="specifications-list"></dl>
+                                <dl>
+                                    <dt>Sistema operativo</dt>
+                                    <dd>Sin sistema operativo</dd>
+
+                                    <dt>Procesador</dt>
+                                    <dd>Intel® Core™ i5-13420H Octa-core (8 núcleos) 2,10 GHz</dd>
+
+                                    <dt>Pantalla</dt>
+                                    <dd>39,6 cm (15,6") Full HD (1920 x 1080) 16:9 IPS 144 Hz</dd>
+
+                                    <dt>Memoria RAM</dt>
+                                    <dd>16 GB, DDR5 SDRAM</dd>
+
+                                    <dt>Almacenamiento</dt>
+                                    <dd>512 GB SSD</dd>
+
+                                    <dt>Tarjeta gráfica</dt>
+                                    <dd>NVIDIA® GeForce RTX™ 3050 con 6 GB de memoria dedicada</dd>
+                                </dl>
                             </div>
+
                         </div>
                     </div>
                     <hr />
                     <div class="row">
                         <div class="col-sm-12 col-md-6 col-lg-6">
-                            <a href="javascript:void(0);" class="btn btn-success btn-lg">Comprar Amazon (<span id="producto-precio-amazon"></span>€)</a>
+                            <a href="javascript:void(0);" class="btn btn-success btn-lg">Comprar Amazon (129.54€)</a>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-6">
                             <div class="btn-group pull-right">
@@ -235,11 +207,223 @@
                 </div>
             </div>
         </div>
+        <!-- SEGUNDA PARTE -->
+        <div class="product-content product-wrap clearfix product-deatil">
+            <div class="row">
+                <div class="bg-white rounded shadow-sm p-4 mb-4 clearfix graph-star-rating">
+                    <h5 class="mb-0 mb-4">Valoraciones Y Opiniones</h5>
+                    <div class="graph-star-rating-header">
+                        <div class="star-rating">
+                            <a href="#"><i class="icofont-ui-rating active"></i></a>
+                            <a href="#"><i class="icofont-ui-rating active"></i></a>
+                            <a href="#"><i class="icofont-ui-rating active"></i></a>
+                            <a href="#"><i class="icofont-ui-rating active"></i></a>
+                            <a href="#"><i class="icofont-ui-rating"></i></a> <b class="text-black ml-2">334 Valoraciones</b>
+                        </div>
+                        <p class="text-black mb-4 mt-2">Puntuación: 3.5 sobre 5</p>
+                    </div>
+                    <div class="graph-star-rating-body">
+                        <div class="rating-list">
+                            <div class="rating-list-left text-black">
+                                5 Star
+                            </div>
+                            <div class="rating-list-center">
+                                <div class="progress">
+                                    <div style="width: 56%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5"
+                                        role="progressbar" class="progress-bar bg-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rating-list-right text-black">56%</div>
+                        </div>
+                        <div class="rating-list">
+                            <div class="rating-list-left text-black">
+                                4 Star
+                            </div>
+                            <div class="rating-list-center">
+                                <div class="progress">
+                                    <div style="width: 23%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5"
+                                        role="progressbar" class="progress-bar bg-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rating-list-right text-black">23%</div>
+                        </div>
+                        <div class="rating-list">
+                            <div class="rating-list-left text-black">
+                                3 Star
+                            </div>
+                            <div class="rating-list-center">
+                                <div class="progress">
+                                    <div style="width: 11%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5"
+                                        role="progressbar" class="progress-bar bg-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rating-list-right text-black">11%</div>
+                        </div>
+                        <div class="rating-list">
+                            <div class="rating-list-left text-black">
+                                2 Star
+                            </div>
+                            <div class="rating-list-center">
+                                <div class="progress">
+                                    <div style="width: 2%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5"
+                                        role="progressbar" class="progress-bar bg-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rating-list-right text-black">02%</div>
+                        </div>
+                    </div>
+                    <div class="graph-star-rating-footer text-center mt-3 mb-3">
+                        <button type="button" class="btn btn-outline-primary btn-sm">Rate and Review</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-content product-wrap clearfix product-deatil">
+            <div class="row">
+                <div class="bg-white rounded shadow-sm p-4 mb-4 restaurant-detailed-ratings-and-reviews">
+                    <a href="#" class="btn btn-outline-primary btn-sm float-right">Comentarios Destacados</a>
+                    <br><br>
+                    <h5 class="mb-1">Todos los Comentarios</h5>
+                    <div class="reviews-members pt-4 pb-4">
+                        <div class="media">
+                            <a href="#"><img alt="Generic placeholder image"
+                                    src="imagenes/paginaProducto/avatar1.png"
+                                    class="mr-3 rounded-pill"></a>
+                            <div class="media-body">
+                                <div class="reviews-members-header">
+                                    <span class="star-rating float-right">
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating"></i></a>
+                                    </span>
+                                    <h6 class="mb-1"><a class="text-black" href="#">Singh Osahan</a></h6>
+                                    <p class="text-gray">Lun, 20 Mar 2020</p>
+                                </div>
+                                <div class="reviews-members-body">
+                                    <p>¡Increíble publicación! 🎮 Estaba pensando en comprar un portátil para gaming y después de leer esta reseña sobre el Acer Nitro V 15, ¡definitivamente lo haré! 😊 Gracias por compartir información tan detallada y útil. Estoy emocionado por la experiencia de juego que me espera. 🚀
+                                    </p>
+                                </div>
+                                <div class="reviews-members-footer">
+                                    <a class="total-like" href="#"><i class="icofont-thumbs-up"></i> 856M</a> <a
+                                        class="total-like" href="#"><i class="icofont-thumbs-down"></i> 158K</a>
+                                    <span class="total-like-user-main ml-2" dir="rtl">
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Gurdeep Osahan"><img alt="Generic placeholder image"
+                                                src="imagenes/paginaProducto/avatar5.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Gurdeep Singh"><img alt="Generic placeholder image"
+                                                src="imagenes/paginaProducto/avatar2.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Askbootstrap"><img alt="Generic placeholder image"
+                                                src="imagenes/paginaProducto/avatar3.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Osahan"><img alt="Generic placeholder image"
+                                                src="imagenes/paginaProducto/avatar4.png"
+                                                class="total-like-user rounded-pill"></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="reviews-members pt-4 pb-4">
+                        <div class="media">
+                            <a href="#"><img alt="Generic placeholder image"
+                                    src="http://bootdey.com/img/Content/avatar/avatar6.png"
+                                    class="mr-3 rounded-pill"></a>
+                            <div class="media-body">
+                                <div class="reviews-members-header">
+                                    <span class="star-rating float-right">
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating active"></i></a>
+                                        <a href="#"><i class="icofont-ui-rating"></i></a>
+                                    </span>
+                                    <h6 class="mb-1"><a class="text-black" href="#">Gurdeep Singh</a></h6>
+                                    <p class="text-gray">Mie, 20 Mar 2020</p>
+                                </div>
+                                <div class="reviews-members-body">
+                                    <p>Quería compartir mi experiencia con el Portátil gaming Acer Nitro V 15. Estuve pensando en comprarlo y finalmente lo hice después de leer esta publicación. El rendimiento es impresionante, y la calidad de la pantalla hace que cada detalle cobre vida. La capacidad de hasta 32 GB de memoria realmente marca la diferencia. Definitivamente, una excelente elección para los amantes de los videojuegos.
+                                    </p>
+                                </div>
+                                <div class="reviews-members-footer">
+                                    <a class="total-like" href="#"><i class="icofont-thumbs-up"></i> 88K</a> <a
+                                        class="total-like" href="#"><i class="icofont-thumbs-down"></i> 1K</a>
+                                    <span class="total-like-user-main ml-2" dir="rtl">
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Gurdeep Osahan"><img alt="Generic placeholder image"
+                                                src="http://bootdey.com/img/Content/avatar/avatar5.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Gurdeep Singh"><img alt="Generic placeholder image"
+                                                src="http://bootdey.com/img/Content/avatar/avatar2.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Askbootstrap"><img alt="Generic placeholder image"
+                                                src="http://bootdey.com/img/Content/avatar/avatar3.png"
+                                                class="total-like-user rounded-pill"></a>
+                                        <a data-toggle="tooltip" data-placement="top" title href="#"
+                                            data-original-title="Osahan"><img alt="Generic placeholder image"
+                                                src="http://bootdey.com/img/Content/avatar/avatar4.png"
+                                                class="total-like-user rounded-pill"></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <a class="text-center w-100 d-block mt-4 font-weight-bold" href="#">Ver Más Comentarios</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="product-content product-wrap clearfix product-deatil">
+            <div class="row">
+                <div class="bg-white rounded shadow-sm p-4 mb-5 rating-review-select-page">
+                    <h5 class="mb-4">Deja Tu Comentario</h5>
+                    <p class="mb-2">Valora El Producto</p>
+                    <div class="mb-4">
+                        <span class="star-rating">
+                            <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
+                            <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
+                            <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
+                            <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
+                            <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
+                        </span>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label>Tu Comentario</label>
+                            <textarea class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary btn-sm" type="button"> Enviar Comentario </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

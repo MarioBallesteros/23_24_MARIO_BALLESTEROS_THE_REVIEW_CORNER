@@ -5,143 +5,113 @@
   AZUL: #3b9ad2
   ROJO: #c32f58 -->
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Review Corner</title>
-  <link rel="stylesheet" type="text/css" href="css/css.css" />
-  <link rel="stylesheet" type="text/css" href="css/component.css" />
-  <!--favicon-->
-  <link rel="icon" href="imagenes/logo.png" type="image/png" />
-  <!-- Bootstrap CDN Link -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
-  <!-- Fontawesome CDN Link -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Custom CSS Link -->
-  <link rel="stylesheet" href="./css/style.css" />
-
-  <script type="module">
-    // Importa todas las funciones necesarias de Firebase
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
-    import { getFirestore, collection, query, where, getDocs,limit } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
-
-    // Configuración de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
-      authDomain: "the-review-corner.firebaseapp.com",
-      projectId: "the-review-corner",
-      storageBucket: "the-review-corner.appspot.com",
-      messagingSenderId: "639567467813",
-      appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
-      measurementId: "G-MEL1Z69T4M"
-    };
-
-    // Inicializa Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Función para el manejo del inicio de sesión
-    async function handleLogin() {
-      const usernameInput = document.getElementById('username').value;
-      const passwordInput = document.getElementById('password').value;
-
-      // Crear una consulta para verificar usuario y contraseña
-      const q = query(collection(db, 'usuario'), where('nombre', '==', usernameInput), where('contrasenya', '==', passwordInput));
-
-      try {
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const userData = querySnapshot.docs[0].data();
-          const userRole = userData.rol;
-
-          if (userRole === 'admin') {
-            window.location.href = 'http://localhost:3000/flutter/';
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Review Corner</title>
+    <link rel="icon" href="imagenes/logo.png" type="image/png">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <!-- Fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="css/css.css">
+    <link rel="stylesheet" type="text/css" href="css/component.css">
+    <link rel="stylesheet" href="css/style.css">
+  
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
+      import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
+  
+      const firebaseConfig = {
+        apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
+        authDomain: "the-review-corner.firebaseapp.com",
+        projectId: "the-review-corner",
+        storageBucket: "the-review-corner.appspot.com",
+        messagingSenderId: "639567467813",
+        appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
+        measurementId: "G-MEL1Z69T4M"
+      };
+  
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+  
+      async function handleLogin() {
+        const usernameInput = document.getElementById('username').value;
+        const passwordInput = document.getElementById('password').value;
+        const userQuery = query(collection(db, 'usuario'), where('nombre', '==', usernameInput), where('contrasenya', '==', passwordInput));
+  
+        try {
+          const querySnapshot = await getDocs(userQuery);
+          if (!querySnapshot.empty) {
+            const userData = querySnapshot.docs[0].data();
+            if (userData.rol === 'admin') {
+              window.location.href = 'http://localhost:3000/flutter/';
+            } else {
+              window.location.href = 'producto.html';
+            }
           } else {
-            window.location.href = 'producto.html';
+            alert('Usuario o contraseña incorrectos');
           }
-        } else {
-          alert('Usuario o contraseña incorrectos');
+        } catch (error) {
+          console.error('Error al obtener los datos del usuario:', error);
+          alert('Error al iniciar sesión');
         }
-      } catch (error) {
-        console.error('Error al obtener los datos del usuario:', error);
-        alert('Error al iniciar sesión');
       }
-    }
+  
+// Assuming you use this function to fill product cards
+function fillProducts() {
+    const productCardsContainer = document.getElementById('product-cards');
+    const categoriasQuery = query(collection(db, 'categoria'));
+    getDocs(categoriasQuery).then(categoriasSnapshot => {
+        let productosMostrados = 0;
+        const maxProductos = 6;
 
-    // Añadir el evento de inicio de sesión
-    document.addEventListener('DOMContentLoaded', function () {
-      document.getElementById('loginButton').onclick = handleLogin;
+        categoriasSnapshot.forEach(categoriaDoc => {
+            if (productosMostrados >= maxProductos) return;
+
+            const categoriaNombre = categoriaDoc.id;
+            const productosCollection = collection(db, `categoria/${categoriaNombre}/productos`);
+            getDocs(query(productosCollection, limit(1))).then(productosSnapshot => {
+                productosSnapshot.forEach(productoDoc => {
+                    if (productosMostrados >= maxProductos) return;
+
+                    const producto = productoDoc.data();
+                    const productCard = `
+                        <div class="col">
+                            <div class="service-card">
+                                <a href="producto.html?categoria=${encodeURIComponent(categoriaNombre)}&id=${productoDoc.id}">
+                                    <div class="icon-wrapper">
+                                        <img class="fa-solid imagenCard" src="${producto.imagen}" alt="${producto.nombre}">
+                                    </div>
+                                    <br>
+                                    <h8 class="productType">${categoriaNombre}</h8>
+                                    <h6 class="productName">${producto.nombre}</h6>
+                                    <p>${producto.descripcion}</p>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    productCardsContainer.innerHTML += productCard;
+                    productosMostrados++;
+                });
+            });
+        });
     });
+}
 
-
-    async function fillProducts() {
-      const productCardsContainer = document.getElementById('product-cards');
-      if (!productCardsContainer) {
-        console.error('Elemento `product-cards` no encontrado');
-        return;
-      }
-
-      productCardsContainer.innerHTML = '';
-      let productosMostrados = 0;
-      const maxProductos = 6;
-
-      // Consulta todas las categorías
-      const categoriasQuery = query(collection(db, 'categoria'));
-      const categoriasSnapshot = await getDocs(categoriasQuery);
-
-      // Recorre cada categoría y sus productos
-      for (const categoriaDoc of categoriasSnapshot.docs) {
-        if (productosMostrados >= maxProductos) break;
-
-        const categoriaNombre = categoriaDoc.id; // `electronica`, `ciclismo`, etc.
-        const productosCollection = collection(db, `categoria/${categoriaNombre}/productos`);
-        const productosQuery = query(productosCollection, limit(1)); // Mostrar solo un producto por categoría
-        const productosSnapshot = await getDocs(productosQuery);
-
-        // Añadir productos al contenedor
-        productosSnapshot.forEach((productoDoc) => {
-          if (productosMostrados >= maxProductos) return;
-
-          const producto = productoDoc.data();
-          const productCard = `
-            <div class="col">
-              <div class="service-card">
-                <a class="referencia" href="producto.html?id=${producto.id}">
-                  <div class="icon-wrapper">
-                    <img class="fa-solid imagenCard" src="${producto.imagen}" />
-                  </div>
-                  <br>
-                  <h8 class="productType">${categoriaNombre}</h8>
-                  <h6 class="productName">${producto.nombre}</h6>
-                  <p>${producto.descripcion}</p>
-                </a>
-              </div>
-            </div>
-          `;
-          productCardsContainer.innerHTML += productCard;
-          productosMostrados++;
-        });
-      }
-
-      // Añadir eventos para redirigir a la página de producto
-      document.querySelectorAll('.service-card').forEach((card) => {
-        card.addEventListener('click', (event) => {
-          const categoria = card.getAttribute('data-categoria');
-          const subcategoria = card.getAttribute('data-subcategoria');
-          const id = card.getAttribute('data-id');
-          window.location.href = `producto.html?categoria=${encodeURIComponent(categoria)}&subcategoria=${encodeURIComponent(subcategoria)}&id=${encodeURIComponent(id)}`;
-        });
+  
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('loginButton').onclick = handleLogin;
+        fillProducts();
       });
-    }
-
-    document.addEventListener('DOMContentLoaded', fillProducts);
-  </script>
-</head>
+    </script>
+  </head>
+  
 
 <body>
   <!-- MODAL SECTION -->

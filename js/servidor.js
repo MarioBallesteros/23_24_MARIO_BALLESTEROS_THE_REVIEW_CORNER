@@ -28,28 +28,24 @@ app.get('/', (req, res) => {
 // Servir la aplicación Flutter en la subruta /flutter
 app.use('/flutter', express.static(path.join(__dirname, '../thefluttercorner-1/build/web')));
 
-// Ruta de la API para obtener los datos de un producto según su ID
-app.get('/api/productos/:id', async (req, res) => {
-    const productId = req.params.id;
-    const productRef = db.collection('productos').doc(productId);
+// Ruta para obtener datos de producto basado en categoría y ID
+app.get('/categoria/:categoria/:id', async (req, res) => {
+    const { categoria, id } = req.params;
 
     try {
-        const productSnapshot = await productRef.get();
+        const productSnapshot = await db.collection('categoria').doc(categoria).collection('productos').doc(id).get();
         if (productSnapshot.exists) {
-            res.json(productSnapshot.data());
+            // Enviar los datos a la página de producto, por ejemplo renderizando la página con un template
+            res.render('producto', { producto: productSnapshot.data() }); // Esto requeriría un motor de plantillas como ejs, pug, etc.
         } else {
-            res.status(404).json({ error: 'Producto no encontrado' });
+            res.status(404).send('Producto no encontrado');
         }
     } catch (error) {
         console.error('Error al obtener el producto:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        res.status(500).send('Error interno del servidor');
     }
 });
 
-// Servir la página del producto con los datos correspondientes
-app.get('/productos/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, '../producto.html'));
-});
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
