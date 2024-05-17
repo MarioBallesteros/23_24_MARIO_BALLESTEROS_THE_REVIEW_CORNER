@@ -5,120 +5,116 @@
   AZUL: #3b9ad2
   ROJO: #c32f58 -->
 
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Review Corner</title>
-    <link rel="icon" href="imagenes/logo.png" type="image/png">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <!-- Fontawesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-      crossorigin="anonymous" referrerpolicy="no-referrer">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" type="text/css" href="css/css.css">
-    <link rel="stylesheet" type="text/css" href="css/component.css">
-    <link rel="stylesheet" href="css/style.css">
-  
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
-      import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
-  
-      const firebaseConfig = {
-        apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
-        authDomain: "the-review-corner.firebaseapp.com",
-        projectId: "the-review-corner",
-        storageBucket: "the-review-corner.appspot.com",
-        messagingSenderId: "639567467813",
-        appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
-        measurementId: "G-MEL1Z69T4M"
-      };
-  
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-  
-      async function handleLogin() {
-        const usernameInput = document.getElementById('username').value;
-        const passwordInput = document.getElementById('password').value;
-        const userQuery = query(collection(db, 'usuario'), where('nombre', '==', usernameInput), where('contrasenya', '==', passwordInput));
-  
-        try {
-          const querySnapshot = await getDocs(userQuery);
-          if (!querySnapshot.empty) {
-            const userData = querySnapshot.docs[0].data();
-            if (userData.rol === 'admin') {
-              window.location.href = 'http://localhost:3000/flutter/';
-            } else {
-              window.location.href = 'producto.html';
-            }
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Review Corner</title>
+  <link rel="icon" href="imagenes/logo.png" type="image/png">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  <!-- Fontawesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="css/css.css">
+  <link rel="stylesheet" type="text/css" href="css/component.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
+    import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
+      authDomain: "the-review-corner.firebaseapp.com",
+      projectId: "the-review-corner",
+      storageBucket: "the-review-corner.appspot.com",
+      messagingSenderId: "639567467813",
+      appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
+      measurementId: "G-MEL1Z69T4M"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function handleLogin() {
+      const usernameInput = document.getElementById('username').value;
+      const passwordInput = document.getElementById('password').value;
+      const userQuery = query(collection(db, 'usuario'), where('nombre', '==', usernameInput), where('contrasenya', '==', passwordInput));
+
+      try {
+        const querySnapshot = await getDocs(userQuery);
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          if (userData.rol === 'admin') {
+            window.location.href = 'http://localhost:3000/flutter/';
           } else {
-            alert('Usuario o contraseña incorrectos');
+            window.location.href = `http://localhost:3000/producto/${userData.categoria}/${userData.id}`;
           }
-        } catch (error) {
-          console.error('Error al obtener los datos del usuario:', error);
-          alert('Error al iniciar sesión');
+        } else {
+          alert('Usuario o contraseña incorrectos');
         }
+      } catch (error) {
+        console.error('Error al obtener los datos del usuario:', error);
+        alert('Error al iniciar sesión');
       }
-  
-// Assuming you use this function to fill product cards
-function fillProducts() {
-    const productCardsContainer = document.getElementById('product-cards');
-    const categoriasQuery = query(collection(db, 'categoria'));
-    getDocs(categoriasQuery).then(categoriasSnapshot => {
+    }
+
+    function fillProducts() {
+      const productCardsContainer = document.getElementById('product-cards');
+      const categoriasQuery = query(collection(db, 'categoria'));
+      getDocs(categoriasQuery).then(categoriasSnapshot => {
         let productosMostrados = 0;
         const maxProductos = 6;
 
         categoriasSnapshot.forEach(categoriaDoc => {
-            if (productosMostrados >= maxProductos) return;
+          if (productosMostrados >= maxProductos) return;
 
-            const categoriaNombre = categoriaDoc.id;
-            const productosCollection = collection(db, `categoria/${categoriaNombre}/productos`);
-            getDocs(query(productosCollection, limit(1))).then(productosSnapshot => {
-                productosSnapshot.forEach(productoDoc => {
-                    if (productosMostrados >= maxProductos) return;
+          const categoriaNombre = categoriaDoc.id;
+          const productosCollection = collection(db, `categoria/${categoriaNombre}/productos`);
+          getDocs(query(productosCollection, limit(1))).then(productosSnapshot => {
+            productosSnapshot.forEach(productoDoc => {
+              if (productosMostrados >= maxProductos) return;
 
-                    const producto = productoDoc.data();
-                    const productCard = `
-                        <div class="col">
-                            <div class="service-card">
-                                <a href="producto.html?categoria=${encodeURIComponent(categoriaNombre)}&id=${productoDoc.id}">
-                                    <div class="icon-wrapper">
-                                        <img class="fa-solid imagenCard" src="${producto.imagen}" alt="${producto.nombre}">
-                                    </div>
-                                    <br>
-                                    <h8 class="productType">${categoriaNombre}</h8>
-                                    <h6 class="productName">${producto.nombre}</h6>
-                                    <p>${producto.descripcion}</p>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                    productCardsContainer.innerHTML += productCard;
-                    productosMostrados++;
-                });
+              const producto = productoDoc.data();
+              const productCard = `
+                <div class="col">
+                  <div class="service-card">
+                    <a href="http://localhost:3000/producto/${categoriaNombre}/${productoDoc.id}">
+                      <div class="icon-wrapper">
+                        <img class="fa-solid imagenCard" src="${producto.imagen}" alt="${producto.nombre}">
+                      </div>
+                      <br>
+                      <h8 class="productType">${categoriaNombre}</h8>
+                      <h6 class="productName">${producto.nombre}</h6>
+                      <p>${producto.descripcion}</p>
+                    </a>
+                  </div>
+                </div>
+              `;
+              productCardsContainer.innerHTML += productCard;
+              productosMostrados++;
             });
+          });
         });
-    });
-}
-
-  
-      document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('loginButton').onclick = handleLogin;
-        fillProducts();
       });
-    </script>
-  </head>
-  
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('loginButton').onclick = handleLogin;
+      fillProducts();
+    });
+  </script>
+</head>
 
 <body>
   <!-- MODAL SECTION -->
   <section class="modal-section">
     <div class="container">
-      <div class="modal fade modal-xl" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel"
-        aria-hidden="true">
+      <div class="modal fade modal-xl" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="content p-5">
@@ -156,7 +152,6 @@ function fillProducts() {
                           <a href="#" class="forgot-pass text-decoration-none">Contraseña Olvidada ?</a>
                         </div>
                         <input type="button" value="Login" id="loginButton" class="orangeBackgroundColor btn btn-block btn-primary ps-5 pe-5 mt-3" />
-
                         <span class="d-block text-center my-4 text-muted">&mdash;&mdash; o Inicia Con &mdash;&mdash;</span>
                         <div class="social-login row justify-content-center gap-2">
                           <a href="#" class="facebook">
@@ -187,9 +182,7 @@ function fillProducts() {
       <nav class="navbar navbar-expand-lg fixed-top menu menu--viola">
         <div class="container">
           <a class="navbar-brand" href="http://localhost:3000/flutter"><img class="logoHeader" src="./imagenes/logo.png" /></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -207,12 +200,10 @@ function fillProducts() {
                 <a class="nav-link menu__link" href="/thefluttercorner-1/build/web/index.html">Sobre Nosotros</a>
               </li>
               <li class="nav-item me-lg-1 ms-lg-1 mb-md-1 mb-sm-1 mb-cs">
-                <a class="nav-link fw-bold shadow btn btn-info text-black btn-sm pd-btn" data-bs-toggle="modal"
-                  data-bs-target="#loginModal" data-bs-whatever="@getbootstrap">Iniciar Sesión</a>
+                <a class="nav-link fw-bold shadow btn btn-info text-black btn-sm pd-btn" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-whatever="@getbootstrap">Iniciar Sesión</a>
               </li>
               <li class="nav-item">
-                <a href="registerPage.html"
-                  class="nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">Registrarse</a>
+                <a href="registerPage.html" class="nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">Registrarse</a>
               </li>
             </ul>
           </div>
@@ -222,7 +213,6 @@ function fillProducts() {
     <!-- Navar Ended -->
   </header>
   <!-- HEADER SECTION ENDED -->
-  </section>
   <main>
     <br><br>
     <!-- ABOUT SECTION STARTS -->
@@ -253,8 +243,7 @@ function fillProducts() {
               ¡Forma parte de nuestra comunidad y toma las mejores decisiones ya mismo!
             </p>
             <div>
-              <a class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3"
-                href="newProductPage.html">Publica Tu Valoración</a>
+              <a class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="newProductPage.html">Publica Tu Valoración</a>
             </div>
           </div>
           <div class="p-sm-3 col-md-5 col-sm-12 col-xs-12">
@@ -299,8 +288,7 @@ function fillProducts() {
                     </div>
                   </div>
                   <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25"
-                      aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
+                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
                   </div>
                 </div>
               </div>
@@ -323,8 +311,7 @@ function fillProducts() {
                     </div>
                   </div>
                   <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-green" role="progressbar" data-width="25%" aria-valuenow="25"
-                      aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
+                    <div class="progress-bar l-bg-green" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
                   </div>
                 </div>
               </div>
@@ -333,7 +320,6 @@ function fillProducts() {
               <div class="card l-bg-green-dark">
                 <div class="card-statistic-3 p-4">
                   <div class="card-icon card-icon-large">
-                    <!-- <i class="fas fa-ticket-alt"></i> -->
                     <i class="far fa-thumbs-up"></i>
                   </div>
                   <div class="mb-4">
@@ -348,8 +334,7 @@ function fillProducts() {
                     </div>
                   </div>
                   <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-orange" role="progressbar" data-width="25%" aria-valuenow="25"
-                      aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
+                    <div class="progress-bar l-bg-orange" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
                   </div>
                 </div>
               </div>
@@ -372,8 +357,7 @@ function fillProducts() {
                     </div>
                   </div>
                   <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25"
-                      aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
+                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
                   </div>
                 </div>
               </div>
@@ -398,8 +382,7 @@ function fillProducts() {
         <div class="row">
           <div class="client">
             <div class="row">
-              <div
-                class="carousel-client row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-6 justify-content-center">
+              <div class="carousel-client row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-6 justify-content-center">
                 <div class="slide">
                   <img src="./imagenes/indice/slider-logo1.png" />
                 </div>

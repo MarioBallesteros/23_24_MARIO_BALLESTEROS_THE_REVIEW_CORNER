@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>PRODUCTO</title>
+    <!--favicon-->
+    <link rel="icon" href="/imagenes/logo.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/cssProduct.css" />
+    <link rel="stylesheet" href="https://allyoucan.cloud/cdn/icofont/1.0.1/icofont.css"
+        integrity="sha384-jbCTJB16Q17718YM9U22iJkhuGbS0Gd2LjaWb4YJEZToOPmnKDjySVa323U+W7Fv" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/css.css" />
+    <link rel="stylesheet" type="text/css" href="/css/component.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/cssNewProduct/app.css" />
+    <link rel="stylesheet" href="/css/cssProduct.css" />
+</head>
+<body>
+    <header>
+        <!-- Navar Starts -->
+        <section id="navar-section">
+            <nav class="navbar navbar-expand-lg fixed-top menu menu--viola">
+                <div class="container">
+                    <a class="navbar-brand" href="#"><img class="logoHeaderProduct" src="/imagenes/logo.png" /></a>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a href="/index.html" class="botonVolver nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">
+                                    <i class="fas fa-arrow-left me-2"></i> Volver
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </section>
+        <!-- Navar Ended -->
+    </header>
+    <br><br><br>
+    <div class="container">
+        <div class="product-content product-wrap clearfix product-deatil">
+            <div class="row">
+                <div class="col-md-5 col-sm-12 col-xs-12">
+                    <div class="product-image">
+                        <div id="myCarousel-2" class="carousel slide">
+                            <ol class="carousel-indicators">
+                                <li data-target="#myCarousel-2" data-slide-to="0"></li>
+                                <li data-target="#myCarousel-2" data-slide-to="1" class="active"></li>
+                                <li data-target="#myCarousel-2" data-slide-to="2"></li>
+                            </ol>
+                            <div class="carousel-inner">
+                                <% if (producto.images && producto.images.length > 0) { %>
+                                    <% producto.images.forEach((image, index) => { %>
+                                        <div class="item <%= index === 0 ? 'active' : '' %> imagenProducto">
+                                            <img src="<%= image %>" class="img-responsive" alt="<%= producto.name %>">
+                                        </div>
+                                    <% }) %>
+                                <% } %>
+                            </div>
+                            <a class="left carousel-control" href="#myCarousel-2" data-slide="prev"> <span class="glyphicon glyphicon-chevron-left"></span> </a>
+                            <a class="right carousel-control" href="#myCarousel-2" data-slide="next"> <span class="glyphicon glyphicon-chevron-right"></span> </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
+                    <h2 class="name">
+                        <%= producto.name %>
+                        <small>Product by <a href="javascript:void(0);"><%= producto.manufacturer %></a></small>
+                        <% for(let i = 0; i < 5; i++) { %>
+                            <i class="fa fa-star fa-2x <%= i < producto.rating ? 'text-primary' : 'text-muted' %>"></i>
+                        <% } %>
+                        <span class="fa fa-2x">
+                            <h5>(<%= producto.votes %>) Votes</h5>
+                        </span>
+                        <a href="javascript:void(0);"><%= producto.reviews %> customer reviews</a>
+                    </h2>
+                    <hr />
+                    <h3 class="price-container">
+                        $<%= producto.price %>
+                        <small>*includes tax</small>
+                    </h3>
+                    <div class="certified">
+                        <ul>
+                            <li>
+                                <a href="javascript:void(0);">Plazo Entrega<span>/7 días hábiles </span></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">Certificado<span>Calidad Asegurada</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr />
+                    <div class="description description-tabs">
+                        <ul id="myTab" class="nav nav-pills">
+                            <li class="active"><a href="#more-information" data-toggle="tab" class="no-margin">
+                                    Descripción Producto </a></li>
+                            <li><a href="#especificaciones" data-toggle="tab">Especificaciones Técnicas</a></li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane fade active in" id="more-information">
+                                <br />
+                                <strong>Descripción</strong>
+                                <p><%= producto.descripcion %></p>
+                            </div>
+                            <div class="tab-pane fade" id="especificaciones">
+                                <br />
+                                <% if (producto.especificaciones) { %>
+                                    <dl>
+                                        <% for (const [key, value] of Object.entries(producto.especificaciones)) { %>
+                                            <% if (typeof value === 'object') { %>
+                                                <% for (const [subKey, subValue] of Object.entries(value)) { %>
+                                                    <dt><%= subKey %>:</dt>
+                                                    <dd><%= subValue %></dd>
+                                                <% } %>
+                                            <% } else { %>
+                                                <dt><%= key %>:</dt>
+                                                <dd><%= value %></dd>
+                                            <% } %>
+                                        <% } %>
+                                    </dl>
+                                <% } else { %>
+                                    <p>No hay especificaciones disponibles.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <a href="javascript:void(0);" class="btn btn-success btn-lg">Comprar Amazon ($<%= producto.price %>)</a>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-white btn-default"><i class="fa fa-star"></i> Añadir a Lista de Deseos</button>
+                                <button class="btn btn-white btn-default"><i class="fa fa-envelope"></i> Contactar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Additional parts can be similarly updated to use EJS for dynamic data insertion -->
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
