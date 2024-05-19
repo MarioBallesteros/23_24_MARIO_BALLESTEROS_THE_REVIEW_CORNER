@@ -18,6 +18,14 @@ body {
     vertical-align: top;
 }
 
+.star-rating .fa-star {
+    font-size: 2em;
+    color: #ddd;
+}
+.star-rating .fa-star.checked {
+    color: #ffca08;
+}
+
 .restaurant-detailed-ratings-and-reviews hr {
     margin: 0 -24px;
 }

@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Review Corner</title>
+  <title>Explorar - The Review Corner</title>
   <link rel="icon" href="imagenes/logo.png" type="image/png">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -74,6 +74,66 @@
       window.location.href = 'http://localhost:3000/';
     }
 
+    async function fetchReviews() {
+      const reviewsContainer = document.getElementById('reviewsContainer');
+      reviewsContainer.innerHTML = '';
+      const reviewsQuery = query(collection(db, 'reviews'));
+
+      try {
+        const reviewsSnapshot = await getDocs(reviewsQuery);
+        reviewsSnapshot.forEach(reviewDoc => {
+          const review = reviewDoc.data();
+          const reviewCard = `
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">${review.titulo}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">${review.autor}</h6>
+                  <p class="card-text">${review.contenido}</p>
+                </div>
+              </div>
+            </div>
+          `;
+          reviewsContainer.innerHTML += reviewCard;
+        });
+      } catch (error) {
+        console.error('Error al obtener las reseñas:', error);
+      }
+    }
+
+    function applyFilter() {
+      const category = document.getElementById('filterCategory').value;
+      const reviewsContainer = document.getElementById('reviewsContainer');
+      reviewsContainer.innerHTML = '';
+
+      let reviewsQuery;
+      if (category === 'all') {
+        reviewsQuery = query(collection(db, 'reviews'));
+      } else {
+        reviewsQuery = query(collection(db, 'reviews'), where('categoria', '==', category));
+      }
+
+      getDocs(reviewsQuery).then(reviewsSnapshot => {
+        reviewsSnapshot.forEach(reviewDoc => {
+          const review = reviewDoc.data();
+          const reviewCard = `
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">${review.titulo}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">${review.autor}</h6>
+                  <p class="card-text">${review.contenido}</p>
+                </div>
+              </div>
+            </div>
+          `;
+          reviewsContainer.innerHTML += reviewCard;
+        });
+      }).catch(error => {
+        console.error('Error al obtener las reseñas filtradas:', error);
+      });
+    }
+
     function updateNavbar() {
       const userId = localStorage.getItem('userId');
       const username = localStorage.getItem('username');
@@ -94,20 +154,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loginButton').onclick = handleLogin;
       document.getElementById('logoutButton').onclick = handleLogout;
+      document.getElementById('applyFilterButton').onclick = applyFilter;
       updateNavbar();
-
-      document.querySelector('.nav-link[href="/"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/';
-      };
-      document.querySelector('.nav-link[href="/explorar"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/explorar';
-      };
-      document.querySelector('.nav-link[href="/thefluttercorner-1/build/web/index.html"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/thefluttercorner-1/build/web/index.html';
-      };
+      fetchReviews();
     });
   </script>
 </head>
@@ -188,11 +237,11 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li class="nav-item menu__item--current">
-                <a class="nav-link menu__link" aria-current="page" href="/">Inicio</a>
-              </li>
               <li class="nav-item">
-                <a class="nav-link menu__link" href="/explorar">Explorar</a>
+                <a class="nav-link menu__link" href="index.html">Inicio</a>
+              </li>
+              <li class="nav-item menu__item--current">
+                <a class="nav-link menu__link" href="#">Explorar</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link menu__link" href="#advertisers">Mis Valoraciones</a>
@@ -218,231 +267,34 @@
   <!-- HEADER SECTION ENDED -->
   <main>
     <br><br>
-    <!-- ABOUT SECTION STARTS -->
-    <section id="about" class="pt-5 pb-5">
+    <!-- FILTER SECTION STARTS -->
+    <section id="filter" class="pt-5 pb-5">
       <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="section-header text-center">
-              <h2 class="fw-bold fs-1 text-center">
-                The
-                <span class="text-primary">Review </span>Corner
-              </h2>
-              <p class="sec-icon"><i class="fa fa-user"></i></p>
-            </div>
-          </div>
-        </div>
-        <div class="row mt-5 mt-md-2">
-          <div class="p-sm-3 col-md-7 col-sm-12 col-xs-12 mt-5 mt-md-2">
-            <h2 class="section-heading">
-              Descubre y Comparte Valoraciones de Productos
-            </h2>
-            <p class="mt-3 mt-md-2 mt-lg-4">
-              En The Review Corner, creemos en la importancia de tomar decisiones de compra informadas. Únete a nuestra
-              comunidad y explora las opiniones de otros, comparte tus propias experiencias y descubre los productos
-              mejor valorados.
-            </p>
-            <p class="text-bg-primary d-inline-block pe-1 ps-1">
-              ¡Forma parte de nuestra comunidad y toma las mejores decisiones ya mismo!
-            </p>
-            <div>
-              <a class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="newProductPage.html">Publica Tu Valoración</a>
-            </div>
-          </div>
-          <div class="p-sm-3 col-md-5 col-sm-12 col-xs-12">
-            <div class="about-img w-100 h-100">
-              <img class="w-100" src="./imagenes/mainImage.jpeg" alt="About" />
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="input-group mb-3">
+              <select class="form-select" id="filterCategory">
+                <option value="all">Todas las Categorías</option>
+                <option value="categoria1">Categoría 1</option>
+                <option value="categoria2">Categoría 2</option>
+                <option value="categoria3">Categoría 3</option>
+              </select>
+              <button class="btn btn-primary" id="applyFilterButton">Aplicar Filtro</button>
             </div>
           </div>
         </div>
       </div>
     </section>
-    <!-- ABOUT SECTION ENDED -->
-    <!-- COUNTER SECTION STARTS -->
-    <section id="counter" class="counter-sec">
+    <!-- FILTER SECTION ENDED -->
+    <!-- REVIEWS SECTION STARTS -->
+    <section id="reviews" class="pt-5 pb-5">
       <div class="container">
-        <div class="row">
-          <div class="section-header text-center">
-            <h2 class="fw-bold fs-1">
-              Nuestras
-              <span class="text-primary">Estadísticas </span>Destacadas
-            </h2>
-            <p class="sec-icon"><i class="fas fa-chart-line"></i></p>
-          </div>
-        </div>
-        <br>
-        <div class="col-lg-12">
-          <div class="row">
-            <div class="col-xl-3 col-lg-6">
-              <div class="card l-bg-cherry">
-                <div class="card-statistic-3 p-4">
-                  <div class="card-icon card-icon-large">
-                    <i class="fas fa-users"></i>
-                  </div>
-                  <div class="mb-4">
-                    <h5 class="card-title mb-0">Usuarios Registrados</h5>
-                  </div>
-                  <div class="row align-items-center mb-2 d-flex">
-                    <div class="col-8">
-                      <h2 class="d-flex align-items-center mb-0">8k+</h2>
-                    </div>
-                    <div class="col-4 text-right">
-                      <span>12.5% <i class="fa fa-arrow-up"></i></span>
-                    </div>
-                  </div>
-                  <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card l-bg-blue-dark">
-                <div class="card-statistic-3 p-4">
-                  <div class="card-icon card-icon-large">
-                    <i class="fas fa-star"></i>
-                  </div>
-                  <div class="mb-4">
-                    <h5 class="card-title mb-0">Valoraciones Realizadas</h5>
-                  </div>
-                  <div class="row align-items-center mb-2 d-flex">
-                    <div class="col-8">
-                      <h2 class="d-flex align-items-center mb-0">25k+</h2>
-                    </div>
-                    <div class="col-4 text-right">
-                      <span>9.23% <i class="fa fa-arrow-up"></i></span>
-                    </div>
-                  </div>
-                  <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-green" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card l-bg-green-dark">
-                <div class="card-statistic-3 p-4">
-                  <div class="card-icon card-icon-large">
-                    <i class="far fa-thumbs-up"></i>
-                  </div>
-                  <div class="mb-4">
-                    <h5 class="card-title mb-0">Satisfacción Post Compra</h5>
-                  </div>
-                  <div class="row align-items-center mb-2 d-flex">
-                    <div class="col-8">
-                      <h2 class="d-flex align-items-center mb-0">98%</h2>
-                    </div>
-                    <div class="col-4 text-right">
-                      <span>10% <i class="fa fa-arrow-up"></i></span>
-                    </div>
-                  </div>
-                  <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-orange" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card l-bg-orange-dark">
-                <div class="card-statistic-3 p-4">
-                  <div class="card-icon card-icon-large">
-                    <i class="fas fa-list"></i>
-                  </div>
-                  <div class="mb-4">
-                    <h5 class="card-title mb-0">Categorías de Productos</h5>
-                  </div>
-                  <div class="row align-items-center mb-2 d-flex">
-                    <div class="col-8">
-                      <h2 class="d-flex align-items-center mb-0">50+</h2>
-                    </div>
-                    <div class="col-4 text-right">
-                      <span>2.5% <i class="fa fa-arrow-up"></i></span>
-                    </div>
-                  </div>
-                  <div class="progress mt-1" data-height="8" style="height: 8px">
-                    <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="row" id="reviewsContainer">
+          <!-- Aquí se añadirán las reseñas -->
         </div>
       </div>
     </section>
-    <!-- COUNTER SECTION ENDED -->
-    <!-- BRANDS SECTION STARTS -->
-    <section id="work" class="work-with pt-5 pb-5">
-      <div class="container">
-        <div class="row">
-          <div class="section-header text-center">
-            <h2 class="fw-bold fs-1">
-              Descuentos
-              <span class="text-primary">en Principales </span> Marcas
-            </h2>
-            <p class="sec-icon"><i class="fa-solid fa-tags"></i></p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="client">
-            <div class="row">
-              <div class="carousel-client row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-6 justify-content-center">
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo1.png" />
-                </div>
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo2.png" />
-                </div>
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo3.png" />
-                </div>
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo1.png" />
-                </div>
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo2.png" />
-                </div>
-                <div class="slide">
-                  <img src="./imagenes/indice/slider-logo3.png" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- BRANDS SECTION ENDED -->
-    <!-- PUBLISHER SERVICE SECTION STARTS -->
-    <section id="publishers" class="publishers-service-sec pt-5 pb-5">
-      <div class="container">
-        <div class="row">
-          <div class="section-header text-center">
-            <h2 class="fw-bold fs-1">
-              Productos
-              <span class="text-primary">en </span>Tendencia
-            </h2>
-            <p class="sec-icon"><i class="fa-solid fa-shopping-cart"></i></p>
-          </div>
-        </div>
-        <div id="product-cards" class="row mt-5 mt-md-4 row-cols-1 row-cols-sm-1 row-cols-md-3 justify-content-center">
-          <% productos.forEach(producto => { %>
-            <div class="col">
-              <div class="service-card">
-                <a href="http://localhost:3000/producto/<%= producto.categoria %>/<%= producto.id %>">
-                  <div class="icon-wrapper">
-                    <img class="fa-solid imagenCard" src="<%= producto.imageUrl %>" alt="<%= producto.nombre %>">
-                  </div>
-                  <br>
-                  <h8 class="productType"><%= producto.categoria %></h8>
-                  <h6 class="productName"><%= producto.nombre %></h6>
-                  <p><%= producto.descripcion %></p>
-                </a>
-              </div>
-            </div>
-          <% }); %>
-        </div>
-      </div>
-    </section>
-    <!-- PUBLISHER SERVICE SECTION ENDED -->
+    <!-- REVIEWS SECTION ENDED -->
   </main>
   <!-- FOOTER SECTION STARTS -->
   <footer class="footer-section">
@@ -507,31 +359,46 @@
   <!-- /container -->
   <script src="js/classie.js"></script>
   <script src="js/clipboard.min.js"></script>
+  <script>
+    (function () {
+      [].slice.call(document.querySelectorAll('.menu')).forEach(function (menu) {
+        var menuItems = menu.querySelectorAll('.menu__link'),
+          setCurrent = function (ev) {
+            ev.preventDefault();
 
+            var item = ev.target.parentNode; // li
+
+            // return if already current
+            if (classie.has(item, 'menu__item--current')) {
+              return false;
+            }
+            // remove current
+            classie.remove(menu.querySelector('.menu__item--current'), 'menu__item--current');
+            // set current
+            classie.add(item, 'menu__item--current');
+          };
+
+        [].slice.call(menuItems).forEach(function (el) {
+          el.addEventListener('click', setCurrent);
+        });
+      });
+
+      [].slice.call(document.querySelectorAll('.link-copy')).forEach(function (link) {
+        link.setAttribute('data-clipboard-text', location.protocol + '//' + location.host + location.pathname + '#' + link.parentNode.id);
+        new Clipboard(link);
+        link.addEventListener('click', function () {
+          classie.add(link, 'link-copy--animate');
+          setTimeout(function () {
+            classie.remove(link, 'link-copy--animate');
+          }, 300);
+        });
+      });
+    })(window);
+  </script>
   <!-- JavaScript Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
     crossorigin="anonymous"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelector('.nav-link[href="/"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/';
-      };
-      document.querySelector('.nav-link[href="/explorar"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/explorar';
-      };
-      document.querySelector('.nav-link[href="#advertisers"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '#advertisers';
-      };
-      document.querySelector('.nav-link[href="/thefluttercorner-1/build/web/index.html"]').onclick = (e) => {
-        e.preventDefault();
-        window.location.href = '/thefluttercorner-1/build/web/index.html';
-      };
-    });
-  </script>
 </body>
 
 </html>
