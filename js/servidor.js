@@ -30,41 +30,47 @@ const db = admin.firestore();
 // Ruta principal que carga la vista 'index.ejs'
 app.get('/', async (req, res) => {
     try {
-      const categoriasSnapshot = await db.collection('categoria').get();
-      const productos = [];
-  
-      for (const categoriaDoc of categoriasSnapshot.docs) {
-        const categoriaNombre = categoriaDoc.id;
-        const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).limit(1).get();
-  
-        for (const productoDoc of productosSnapshot.docs) {
-          const producto = productoDoc.data();
-          const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}/` });
-  
-          if (files.length > 0) {
-            const [url] = await files[0].getSignedUrl({
-              action: 'read',
-              expires: '03-09-2491'
-            });
-            console.log(`URL for product ${productoDoc.id}: ${url}`); // Añadir este console.log
-            producto.imageUrl = url;
-          }
-  
-          productos.push({
-            ...producto,
-            categoria: categoriaNombre,
-            id: productoDoc.id
-          });
+        const categoriasSnapshot = await db.collection('categoria').get();
+        const productos = [];
+
+        for (const categoriaDoc of categoriasSnapshot.docs) {
+            const categoriaNombre = categoriaDoc.id;
+            const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).limit(1).get();
+
+            for (const productoDoc of productosSnapshot.docs) {
+                const producto = productoDoc.data();
+                const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
+
+                if (files.length > 0) {
+                    const [url] = await files[0].getSignedUrl({
+                        action: 'read',
+                        expires: '03-09-2491'
+                    });
+
+                    // Agrega un log para verificar la URL generada
+                    console.log(`Generated URL for product ${productoDoc.id}: ${url}`);
+
+                    producto.imageUrl = url;
+                } else {
+                    console.log(`No files found for product ${productoDoc.id}`);
+                }
+
+                productos.push({
+                    ...producto,
+                    categoria: categoriaNombre,
+                    id: productoDoc.id
+                });
+            }
         }
-      }
-  
-      res.render('index', { productos });
+
+        console.log(`Productos to render: ${JSON.stringify(productos, null, 2)}`);
+        res.render('index', { productos });
     } catch (error) {
-      console.error('Error al obtener los productos:', error);
-      res.status(500).send('Error interno del servidor');
+        console.error('Error al obtener los productos:', error);
+        res.status(500).send('Error interno del servidor');
     }
-  });
-  
+});
+
 
 // Ruta para obtener datos de producto basado en categoría y ID
 app.get('/producto/:categoria/:id', async (req, res) => {
