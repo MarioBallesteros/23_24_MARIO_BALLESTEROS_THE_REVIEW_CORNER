@@ -110,30 +110,45 @@ app.get('/producto/:categoria/:id', async (req, res) => {
 
 app.get('/explorar', async (req, res) => {
     try {
-      const reviewsSnapshot = await db.collection('reviews').get();
-      const reviews = [];
+      // Obtén todas las categorías
+      const categoriasSnapshot = await db.collection('categoria').get();
+      const categorias = categoriasSnapshot.docs.map(doc => doc.id);
+      const productos = [];
   
-      for (const doc of reviewsSnapshot.docs) {
-        const review = doc.data();
-        const [files] = await bucket.getFiles({ prefix: `imagenesReview/${doc.id}/` });
+      for (const categoriaNombre of categorias) {
+        const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).get();
   
-        if (files.length > 0) {
-          const [url] = await files[0].getSignedUrl({
-            action: 'read',
-            expires: '03-09-2491'
-          });
-          review.imageUrl = url;
+        for (const productoDoc of productosSnapshot.docs) {
+          const producto = productoDoc.data();
+          const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
+  
+          let imageUrls = [];
+          if (files.length > 0) {
+            imageUrls = await Promise.all(files.map(async (file) => {
+              const [url] = await file.getSignedUrl({
+                action: 'read',
+                expires: '03-09-2491'
+              });
+              return url;
+            }));
+          }
+  
+          producto.images = imageUrls;
+          producto.id = productoDoc.id;
+          producto.categoria = categoriaNombre;
+  
+          productos.push(producto);
         }
-  
-        reviews.push(review);
       }
   
-      res.render('explorar', { reviews });
+      res.render('explorar', { productos, categorias });
     } catch (error) {
-      console.error('Error getting reviews:', error);
-      res.status(500).send('Error loading reviews');
+      console.error('Error al obtener los productos y categorías:', error);
+      res.status(500).send('Error interno del servidor');
     }
   });
+  
+
 
 // Servir archivos estáticos, asegúrate de que la ruta es correcta
 app.use(express.static(path.join(__dirname, '../')));
