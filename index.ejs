@@ -428,30 +428,25 @@
             <div class="col">
               <div class="service-card">
                 <a href="http://localhost:3000/producto/<%= producto.categoria %>/<%= producto.id %>">
-                  <div class="product-image">
+                  <div class="icon-wrapper">
                     <div id="myCarousel-<%= producto.id %>" class="carousel slide">
                       <ol class="carousel-indicators">
-                        <% producto.images.forEach((image, index) => { %>
+                        <% (producto.images || []).forEach((image, index) => { %>
                           <li data-target="#myCarousel-<%= producto.id %>" data-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>"></li>
                         <% }) %>
                       </ol>
                       <div class="carousel-inner">
-                        <% producto.images.forEach((image, index) => { %>
-                          <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                            <img src="<%= image %>" class="d-block w-100" alt="<%= producto.nombre %>">
+                        <% (producto.images || []).forEach((image, index) => { %>
+                          <div class="item <%= index === 0 ? 'active' : '' %> imagenProducto">
+                            <img src="<%= image %>" class="img-responsive" alt="<%= producto.nombre %>">
                           </div>
                         <% }) %>
                       </div>
-                      <a class="carousel-control-prev" href="#myCarousel-<%= producto.id %>" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                      </a>
-                      <a class="carousel-control-next" href="#myCarousel-<%= producto.id %>" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                      </a>
+                      <a class="left carousel-control" href="#myCarousel-<%= producto.id %>" data-slide="prev"> <span class="glyphicon glyphicon-chevron-left"></span> </a>
+                      <a class="right carousel-control" href="#myCarousel-<%= producto.id %>" data-slide="next"> <span class="glyphicon glyphicon-chevron-right"></span> </a>
                     </div>
                   </div>
+                  
                   <br>
                   <h8 class="productType"><%= producto.categoria %></h8>
                   <h6 class="productName"><%= producto.nombre %></h6>

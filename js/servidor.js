@@ -41,19 +41,20 @@ app.get('/', async (req, res) => {
                 const producto = productoDoc.data();
                 const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
 
+                let imageUrls = [];
                 if (files.length > 0) {
-                    const [url] = await files[0].getSignedUrl({
-                        action: 'read',
-                        expires: '03-09-2491'
-                    });
-
-                    // Agrega un log para verificar la URL generada
-                    console.log(`Generated URL for product ${productoDoc.id}: ${url}`);
-
-                    producto.imageUrl = url;
-                } else {
-                    console.log(`No files found for product ${productoDoc.id}`);
+                    imageUrls = await Promise.all(files.slice(1).map(async (file) => { 
+                        const [url] = await file.getSignedUrl({
+                            action: 'read',
+                            expires: '03-09-2491'
+                        });
+                        return url;
+                    }));
                 }
+
+                producto.images = imageUrls;
+
+                console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
 
                 productos.push({
                     ...producto,
