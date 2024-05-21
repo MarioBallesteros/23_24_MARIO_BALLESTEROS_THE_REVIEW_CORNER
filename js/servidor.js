@@ -110,45 +110,74 @@ app.get('/producto/:categoria/:id', async (req, res) => {
 
 app.get('/explorar', async (req, res) => {
     try {
-      // Obtén todas las categorías
-      const categoriasSnapshot = await db.collection('categoria').get();
-      const categorias = categoriasSnapshot.docs.map(doc => doc.id);
-      const productos = [];
-  
-      for (const categoriaNombre of categorias) {
-        const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).get();
-  
-        for (const productoDoc of productosSnapshot.docs) {
-          const producto = productoDoc.data();
-          const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
-  
-          let imageUrls = [];
-          if (files.length > 0) {
-            imageUrls = await Promise.all(files.map(async (file) => {
-              const [url] = await file.getSignedUrl({
-                action: 'read',
-                expires: '03-09-2491'
-              });
-              return url;
-            }));
-          }
-  
-          producto.images = imageUrls;
-          producto.id = productoDoc.id;
-          producto.categoria = categoriaNombre;
-  
-          productos.push(producto);
-        }
-      }
-  
-      res.render('explorar', { productos, categorias });
-    } catch (error) {
-      console.error('Error al obtener los productos y categorías:', error);
-      res.status(500).send('Error interno del servidor');
-    }
-  });
-  
+        const categoriasQuery = req.query.categorias ? req.query.categorias.split(',') : [];
+        const categoriasSnapshot = await db.collection('categoria').get();
+        const productos = [];
+        const categorias = categoriasSnapshot.docs.map(doc => doc.id);
 
+        if (categoriasQuery.length > 0) {
+            for (const categoria of categoriasQuery) {
+                const productosSnapshot = await db.collection(`categoria/${categoria}/productos`).get();
+                for (const productoDoc of productosSnapshot.docs) {
+                    const producto = productoDoc.data();
+                    const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoria}/${productoDoc.id}` });
+
+                    let imageUrls = [];
+                    if (files.length > 0) {
+                        imageUrls = await Promise.all(files.slice(1).map(async (file) => {
+                            const [url] = await file.getSignedUrl({
+                                action: 'read',
+                                expires: '03-09-2491'
+                            });
+                            return url;
+                        }));
+                    }
+
+                    producto.images = imageUrls;
+
+                    productos.push({
+                        ...producto,
+                        categoria: categoria,
+                        id: productoDoc.id
+                    });
+                }
+            }
+        } else {
+            for (const categoriaDoc of categoriasSnapshot.docs) {
+                const categoriaNombre = categoriaDoc.id;
+                const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).limit(1).get();
+                for (const productoDoc of productosSnapshot.docs) {
+                    const producto = productoDoc.data();
+                    const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
+
+                    let imageUrls = [];
+                    if (files.length > 0) {
+                        imageUrls = await Promise.all(files.slice(1).map(async (file) => {
+                            const [url] = await file.getSignedUrl({
+                                action: 'read',
+                                expires: '03-09-2491'
+                            });
+                            return url;
+                        }));
+                    }
+
+                    producto.images = imageUrls;
+
+                    productos.push({
+                        ...producto,
+                        categoria: categoriaNombre,
+                        id: productoDoc.id
+                    });
+                }
+            }
+        }
+
+        res.render('explorar', { productos, categorias });
+    } catch (error) {
+        console.error('Error al obtener los productos y categorías:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
 
 // Servir archivos estáticos, asegúrate de que la ruta es correcta
 app.use(express.static(path.join(__dirname, '../')));
