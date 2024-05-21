@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- COLORES PRINCIPALES PROYECTO:
-  NARANJA: #fe8137
-  AZUL: #3b9ad2
-  ROJO: #c32f58 -->
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -110,10 +105,16 @@
       window.location.href = `/explorar?categorias=${queryString}`;
     }
 
+    function clearFilter() {
+      document.getElementById('filterCategory').selectedIndex = -1;
+      window.location.href = '/explorar';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loginButton').onclick = handleLogin;
       document.getElementById('logoutButton').onclick = handleLogout;
       document.getElementById('applyFilterButton').onclick = applyFilter;
+      document.getElementById('clearFilterButton').onclick = clearFilter;
       updateNavbar();
     });
   </script>
@@ -231,12 +232,18 @@
         <div class="row justify-content-center">
           <div class="col-md-8">
             <div class="input-group mb-3">
-              <select class="form-select" id="filterCategory" multiple>
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Seleccionar Categorías</button>
+              <ul class="dropdown-menu" id="filterCategory">
                 <% categorias.forEach(categoria => { %>
-                  <option value="<%= categoria %>"><%= categoria %></option>
+                  <li>
+                    <label class="dropdown-item">
+                      <input type="checkbox" value="<%= categoria %>" /> <%= categoria %>
+                    </label>
+                  </li>
                 <% }); %>
-              </select>
+              </ul>
               <button class="btn btn-primary" id="applyFilterButton">Aplicar Filtro</button>
+              <button class="btn btn-secondary" id="clearFilterButton">Limpiar Filtros</button>
             </div>
           </div>
         </div>
@@ -343,5 +350,25 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
     crossorigin="anonymous"></script>
+  <script>
+    function applyFilter() {
+      const selectedCategories = Array.from(document.querySelectorAll('#filterCategory input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
+      const queryString = selectedCategories.join(',');
+      window.location.href = `/explorar?categorias=${queryString}`;
+    }
+
+    function clearFilter() {
+      document.querySelectorAll('#filterCategory input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      window.location.href = '/explorar';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('applyFilterButton').onclick = applyFilter;
+      document.getElementById('clearFilterButton').onclick = clearFilter;
+    });
+  </script>
 </body>
 </html>
