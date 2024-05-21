@@ -99,22 +99,25 @@
     }
 
     function applyFilter() {
-      const selectedCategories = Array.from(document.getElementById('filterCategory').selectedOptions)
-        .map(option => option.value);
+      const selectedCategories = Array.from(document.querySelectorAll('#filterCategory input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
       const queryString = selectedCategories.join(',');
+      console.log('Applying filter with categories:', queryString);  // Debug log
       window.location.href = `/explorar?categorias=${queryString}`;
     }
 
     function clearFilter() {
-      document.getElementById('filterCategory').selectedIndex = -1;
+      document.querySelectorAll('#filterCategory input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      console.log('Clearing filter');  // Debug log
       window.location.href = '/explorar';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('loginButton').onclick = handleLogin;
-      document.getElementById('logoutButton').onclick = handleLogout;
       document.getElementById('applyFilterButton').onclick = applyFilter;
       document.getElementById('clearFilterButton').onclick = clearFilter;
+      console.log('Event listeners added');  // Debug log
       updateNavbar();
     });
   </script>
@@ -368,6 +371,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('applyFilterButton').onclick = applyFilter;
       document.getElementById('clearFilterButton').onclick = clearFilter;
+      updateNavbar();
     });
   </script>
 </body>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--favicon-->
+  <link rel="icon" href="imagenes/logo.png" type="image/png" />
+  <!--plugins-->
+  <link href="css/cssNewProduct/imageuploadify.min.css" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+  <link href="css/cssNewProduct/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="css/cssNewProduct/app.css" rel="stylesheet">
+  <!-- Boxicons CDN Link -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <title>Crear Nuevo Producto</title>
+  <link rel="stylesheet" type="text/css" href="css/css.css" />
+  <!-- Custom CSS Link -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <!-- Bootstrap CSS 2-->
+  <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/cssProduct.css" />
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js';
+    import { getFirestore, collection, doc, setDoc, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRLXwlOR3NThFqqi1KqzORUFimt5ngOf0",
+      authDomain: "the-review-corner.firebaseapp.com",
+      projectId: "the-review-corner",
+      storageBucket: "the-review-corner.appspot.com",
+      messagingSenderId: "639567467813",
+      appId: "1:639567467813:web:437f189e0df405e4e7b6cc",
+      measurementId: "G-MEL1Z69T4M"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function saveProduct() {
+      const nombre = document.getElementById('inputProductTitle').value;
+      const descripcion = document.getElementById('inputProductDescription').value;
+      const precio = document.getElementById('inputPrice').value;
+      const categoria = document.getElementById('inputProductType').value;
+
+      if (!nombre || !descripcion || !precio || !categoria) {
+        alert('Todos los campos son obligatorios');
+        return;
+      }
+
+      // Obtener el último ID disponible y sumar 1
+      const categoriaRef = collection(db, `categoria/${categoria}/productos`);
+      const q = query(categoriaRef, orderBy('id', 'desc'), limit(1));
+      const querySnapshot = await getDocs(q);
+      let newId = 1;
+
+      querySnapshot.forEach(doc => {
+        newId = doc.data().id + 1;
+      });
+
+      // Guardar el nuevo producto
+      const productoRef = doc(db, `categoria/${categoria}/productos`, newId.toString());
+      await setDoc(productoRef, {
+        id: newId,
+        nombre: nombre,
+        descripcion: descripcion,
+        precio: precio,
+        categoria: categoria
+      });
+
+      alert('Producto guardado exitosamente');
+      window.location.href = '/explorar';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('saveProductButton').onclick = saveProduct;
+    });
+  </script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="page-wrapper">
+      <div class="page-content">
+        <div class="card">
+          <div class="card-body p-4">
+            <div class="container">
+              <a class="navbar-brand" href="#"><img class="logoHeaderNewProduct" src="./imagenes/logo.png" /></a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a href="index.html" class="botonVolver nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">Volver</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body p-4">
+            <h5 class="card-title">Añadir Nuevo Producto</h5>
+            <hr />
+            <div class="form-body mt-4">
+              <div class="row">
+                <div class="col-lg-8">
+                  <div class="border border-3 p-4 rounded">
+                    <div class="mb-3">
+                      <label for="inputProductTitle" class="form-label">Nombre del Producto</label>
+                      <input type="text" class="form-control" id="inputProductTitle" placeholder="Enter product title">
+                    </div>
+                    <div class="mb-3">
+                      <label for="inputProductDescription" class="form-label">Descripción</label>
+                      <textarea class="form-control" id="inputProductDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                      <label for="inputProductImages" class="form-label">Imágenes del Producto</label>
+                      <input id="image-uploadify" type="file" accept="image/*" multiple>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="border border-3 p-4 rounded">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label for="inputPrice" class="form-label">Precio</label>
+                        <input type="text" class="form-control" id="inputPrice" placeholder="00.00">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="inputCompareatprice" class="form-label">Compare at Price</label>
+                        <input type="text" class="form-control" id="inputCompareatprice" placeholder="00.00">
+                      </div>
+                      <div class="col-12">
+                        <label for="inputProductType" class="form-label">Categoría</label>
+                        <select class="form-select" id="inputProductType">
+                          <% categorias.forEach(categoria => { %>
+                            <option value="<%= categoria %>"><%= categoria %></option>
+                          <% }); %>
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <div class="d-grid">
+                          <button type="button" class="btn btn-primary" id="saveProductButton">Guardar Producto</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--end row-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--end page wrapper -->
+    <footer class="page-footer">
+      <p class="mb-0">Copyright © 2021. All right reserved.</p>
+    </footer>
+  </div>
+  <!--plugins-->
+  <script src="css/cssNewProduct/js/jquery.min.js"></script>
+  <script src="css/cssNewProduct/js/imageuploadify.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#image-uploadify').imageuploadify();
+    });
+  </script>
+</body>
+</html>
