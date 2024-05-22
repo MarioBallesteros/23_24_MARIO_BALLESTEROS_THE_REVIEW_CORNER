@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- COLORES PRINCIPALES PROYECTO:
-  NARANJA: #fe8137
-  AZUL: #3b9ad2
-  ROJO: #c32f58 -->
+<!-- COLORES PRINCIPALES PROYECTO: NARANJA: #fe8137 AZUL: #3b9ad2 ROJO: #c32f58 -->
 
 <head>
   <meta charset="UTF-8">
@@ -94,11 +91,11 @@
     function checkLoginAndRedirect() {
       const userId = localStorage.getItem('userId');
       if (userId) {
-        window.location.href = 'newProductPage.html';
+        window.location.href = '/nuevoProducto';
       } else {
         alert('Debe iniciar sesión para crear una publicación.');
       }
-  }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loginButton').onclick = handleLogin;
@@ -118,7 +115,7 @@
         window.location.href = '/thefluttercorner-1/build/web/index.html';
       };
 
-      document.querySelector('a[href="newProductPage.html"]').onclick = (e) => {
+      document.getElementById('publicaValoracionButton').onclick = (e) => {
         e.preventDefault();
         checkLoginAndRedirect();
       };
@@ -260,7 +257,7 @@
               ¡Forma parte de nuestra comunidad y toma las mejores decisiones ya mismo!
             </p>
             <div>
-              <a id="publicaValoracionButton" class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="newProductPage.html">Publica Tu Valoración</a>
+              <a id="publicaValoracionButton" class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="/nuevoProducto">Publica Tu Valoración</a>
             </div>
           </div>
           <div class="p-sm-3 col-md-5 col-sm-12 col-xs-12">
@@ -559,6 +556,11 @@
       document.querySelector('.nav-link[href="/thefluttercorner-1/build/web/index.html"]').onclick = (e) => {
         e.preventDefault();
         window.location.href = '/thefluttercorner-1/build/web/index.html';
+      };
+
+      document.getElementById('publicaValoracionButton').onclick = (e) => {
+        e.preventDefault();
+        checkLoginAndRedirect();
       };
     });
   </script>

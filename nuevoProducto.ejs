@@ -38,19 +38,95 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function saveProduct() {
-      const nombre = document.getElementById('inputProductTitle').value;
-      const descripcion = document.getElementById('inputProductDescription').value;
-      const precio = document.getElementById('inputPrice').value;
-      const categoria = document.getElementById('inputProductType').value;
+    async function loadFieldsForCategory(category) {
+      console.log('Categoría seleccionada:', category);
+      const categoriaRef = collection(db, `categoria/${category}/productos`);
+      const q = query(categoriaRef, orderBy('id', 'asc'), limit(1));
+      
+      try {
+        const querySnapshot = await getDocs(q);
+        console.log('Query snapshot:', querySnapshot);
 
-      if (!nombre || !descripcion || !precio || !categoria) {
-        alert('Todos los campos son obligatorios');
+        if (!querySnapshot.empty) {
+          const productData = querySnapshot.docs[0].data();
+          console.log('Datos del producto:', productData);
+          const formContainer = document.getElementById('dynamicFields');
+          formContainer.innerHTML = '';
+
+          for (const key in productData) {
+            if (key !== 'id') {
+              const fieldDiv = document.createElement('div');
+              fieldDiv.className = 'mb-3';
+
+              const label = document.createElement('label');
+              label.className = 'form-label';
+              label.for = `input${key.charAt(0).toUpperCase() + key.slice(1)}`;
+              label.innerText = key.charAt(0).toUpperCase() + key.slice(1);
+              fieldDiv.appendChild(label);
+
+              if (key === 'descripcion') {
+                const textarea = document.createElement('textarea');
+                textarea.className = 'form-control';
+                textarea.id = `input${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                textarea.rows = 3;
+                fieldDiv.appendChild(textarea);
+              } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control';
+                input.id = `input${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                fieldDiv.appendChild(input);
+              }
+
+              formContainer.appendChild(fieldDiv);
+            }
+          }
+
+          const imagesDiv = document.createElement('div');
+          imagesDiv.className = 'mb-3';
+
+          const imagesLabel = document.createElement('label');
+          imagesLabel.className = 'form-label';
+          imagesLabel.innerText = 'Imágenes del Producto';
+          imagesDiv.appendChild(imagesLabel);
+
+          const imagesInput = document.createElement('input');
+          imagesInput.type = 'file';
+          imagesInput.id = 'image-uploadify';
+          imagesInput.accept = 'image/*';
+          imagesInput.multiple = true;
+          imagesDiv.appendChild(imagesInput);
+
+          formContainer.appendChild(imagesDiv);
+
+          $('#image-uploadify').imageuploadify();
+        } else {
+          console.log('No hay productos en esta categoría.');
+        }
+      } catch (error) {
+        console.error('Error al cargar los campos para la categoría:', error);
+      }
+    }
+
+    async function saveProduct() {
+      const formContainer = document.getElementById('dynamicFields');
+      const inputs = formContainer.querySelectorAll('input, textarea');
+      const productData = {};
+
+      inputs.forEach(input => {
+        const key = input.id.replace('input', '').charAt(0).toLowerCase() + input.id.replace('input', '').slice(1);
+        productData[key] = input.value;
+      });
+
+      const category = document.getElementById('inputProductType').value;
+
+      if (!category) {
+        alert('Debe seleccionar una categoría.');
         return;
       }
 
       // Obtener el último ID disponible y sumar 1
-      const categoriaRef = collection(db, `categoria/${categoria}/productos`);
+      const categoriaRef = collection(db, `categoria/${category}/productos`);
       const q = query(categoriaRef, orderBy('id', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       let newId = 1;
@@ -60,14 +136,9 @@
       });
 
       // Guardar el nuevo producto
-      const productoRef = doc(db, `categoria/${categoria}/productos`, newId.toString());
-      await setDoc(productoRef, {
-        id: newId,
-        nombre: nombre,
-        descripcion: descripcion,
-        precio: precio,
-        categoria: categoria
-      });
+      productData.id = newId;
+      const productoRef = doc(db, `categoria/${category}/productos`, newId.toString());
+      await setDoc(productoRef, productData);
 
       alert('Producto guardado exitosamente');
       window.location.href = '/explorar';
@@ -75,6 +146,9 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('saveProductButton').onclick = saveProduct;
+      document.getElementById('inputProductType').onchange = (e) => {
+        loadFieldsForCategory(e.target.value);
+      };
     });
   </script>
 </head>
@@ -108,32 +182,13 @@
             <div class="form-body mt-4">
               <div class="row">
                 <div class="col-lg-8">
-                  <div class="border border-3 p-4 rounded">
-                    <div class="mb-3">
-                      <label for="inputProductTitle" class="form-label">Nombre del Producto</label>
-                      <input type="text" class="form-control" id="inputProductTitle" placeholder="Enter product title">
-                    </div>
-                    <div class="mb-3">
-                      <label for="inputProductDescription" class="form-label">Descripción</label>
-                      <textarea class="form-control" id="inputProductDescription" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                      <label for="inputProductImages" class="form-label">Imágenes del Producto</label>
-                      <input id="image-uploadify" type="file" accept="image/*" multiple>
-                    </div>
+                  <div class="border border-3 p-4 rounded" id="dynamicFields">
+                    <!-- Campos dinámicos se cargarán aquí -->
                   </div>
                 </div>
                 <div class="col-lg-4">
                   <div class="border border-3 p-4 rounded">
                     <div class="row g-3">
-                      <div class="col-md-6">
-                        <label for="inputPrice" class="form-label">Precio</label>
-                        <input type="text" class="form-control" id="inputPrice" placeholder="00.00">
-                      </div>
-                      <div class="col-md-6">
-                        <label for="inputCompareatprice" class="form-label">Compare at Price</label>
-                        <input type="text" class="form-control" id="inputCompareatprice" placeholder="00.00">
-                      </div>
                       <div class="col-12">
                         <label for="inputProductType" class="form-label">Categoría</label>
                         <select class="form-select" id="inputProductType">

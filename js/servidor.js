@@ -179,6 +179,48 @@ app.get('/explorar', async (req, res) => {
     }
 });
 
+app.get('/nuevoProducto', async (req, res) => {
+    try {
+        const categoriasSnapshot = await db.collection('categoria').get();
+        const categorias = categoriasSnapshot.docs.map(doc => doc.id);
+        res.render('nuevoProducto', { categorias });
+    } catch (error) {
+        console.error('Error al obtener las categorías:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+app.post('/nuevoProducto', async (req, res) => {
+    try {
+        const { nombre, descripcion, precio, categoria, imagenes } = req.body;
+
+        // Obtener el último ID disponible y sumar 1
+        const categoriaRef = db.collection(`categoria/${categoria}/productos`);
+        const q = categoriaRef.orderBy('id', 'desc').limit(1);
+        const querySnapshot = await q.get();
+        let newId = 1;
+
+        querySnapshot.forEach(doc => {
+            newId = doc.data().id + 1;
+        });
+
+        // Guardar el nuevo producto
+        await categoriaRef.doc(newId.toString()).set({
+            id: newId,
+            nombre,
+            descripcion,
+            precio,
+            categoria,
+            imagenes
+        });
+
+        res.redirect('/explorar');
+    } catch (error) {
+        console.error('Error al guardar el producto:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
 // Servir archivos estáticos, asegúrate de que la ruta es correcta
 app.use(express.static(path.join(__dirname, '../')));
 
