@@ -41,7 +41,7 @@
     async function loadFieldsForCategory(category) {
       console.log('Categoría seleccionada:', category);
       const categoriaRef = collection(db, `categoria/${category}/productos`);
-      const q = query(categoriaRef, orderBy('id', 'asc'), limit(1));
+      const q = query(categoriaRef, limit(1));
       
       try {
         const querySnapshot = await getDocs(q);
@@ -125,18 +125,22 @@
         return;
       }
 
-      // Obtener el último ID disponible y sumar 1
+      // Obtener el último documento disponible y sumar 1
       const categoriaRef = collection(db, `categoria/${category}/productos`);
-      const q = query(categoriaRef, orderBy('id', 'desc'), limit(1));
+      const q = query(categoriaRef, orderBy('__name__', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       let newId = 1;
 
-      querySnapshot.forEach(doc => {
-        newId = doc.data().id + 1;
-      });
+      if (!querySnapshot.empty) {
+        querySnapshot.forEach(doc => {
+          const docId = parseInt(doc.id);
+          if (!isNaN(docId)) {
+            newId = docId + 1;
+          }
+        });
+      }
 
       // Guardar el nuevo producto
-      productData.id = newId;
       const productoRef = doc(db, `categoria/${category}/productos`, newId.toString());
       await setDoc(productoRef, productData);
 
