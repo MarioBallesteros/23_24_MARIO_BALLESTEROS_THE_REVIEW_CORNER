@@ -10,10 +10,20 @@ $(function(){
             next: "Continuar",
             previous: "Retroceder"
         },
-        onFinished: function () {
-            // Redirige a la página de inicio (cambia 'index.html' por tu ruta correcta)
-            window.location.href = 'index.html';
+        onFinished: function (event, currentIndex) {
+            $("#wizard").submit();
         }
+    });
+
+    $("#wizard").submit(function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        $.post('/registro', formData, function(data) {
+            alert('Registro completado con éxito.');
+            window.location.href = '/'; // Redirige si el registro es exitoso.
+        }).fail(function() {
+            alert('Error al guardar los datos.');
+        });
     });
     
     $('.wizard > .steps li a').click(function(){

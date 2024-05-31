@@ -9,6 +9,7 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); //Necesario para mandar el formulario de registro por el body
 app.set('view engine', 'ejs'); // Establece EJS como el motor de plantillas
 app.set('views', path.join(__dirname,"../")); // Asegúrate que la ruta es correcta y que los archivos .ejs están ahí
 
@@ -27,7 +28,76 @@ app.use('/flutter', express.static(path.join(__dirname, '../thefluttercorner-1/b
 
 const db = admin.firestore();
 
-// Ruta principal que carga la vista 'index.ejs'
+db.settings({
+    ignoreUndefinedProperties: true //necesario para poder poner los campos de POST a null
+  });
+
+  function acortarDescripcion(descripcion) {
+    if (!descripcion) return "";  
+    const limitePalabras = 10;
+    const palabras = descripcion.split(' ');
+    return palabras.length > limitePalabras ?
+      palabras.slice(0, limitePalabras).join(' ') + '...' :
+      descripcion;
+  }
+  
+// Endpoint para obtener todas las categorías con todos los productos incluidos
+app.get('/json', async (req, res) => {
+    try {
+        const categoriasSnapshot = await db.collection('categoria').get();
+        const categorias = [];
+
+        // Bucle para obtener categorías
+        for (const categoriaDoc of categoriasSnapshot.docs) {
+            const categoriaDatos = categoriaDoc.data();
+            const productosSnapshot = await db.collection(`categoria/${categoriaDoc.id}/productos`).get();
+            const productos = [];
+
+            // Bucle para obtener productos de cada categoría
+            for (const productoDoc of productosSnapshot.docs) {
+                productos.push({
+                    id: productoDoc.id,
+                    ...productoDoc.data()
+                });
+            }
+
+            categorias.push({
+                id: categoriaDoc.id,
+                ...categoriaDatos,
+                productos: productos  // Incluir productos en la categoría
+            });
+        }
+
+        res.json(categorias);
+    } catch (error) {
+        console.error('Error al obtener categorías y productos:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+// Endpoint para obtener todos los usuarios como JSON
+app.get('/usuarios_json', async (req, res) => {
+    try {
+        const usuariosSnapshot = await db.collection('usuario').get();
+        const usuarios = [];
+
+        // Bucle para obtener usuarios
+        for (const usuarioDoc of usuariosSnapshot.docs) {
+            usuarios.push({
+                id: usuarioDoc.id,
+                ...usuarioDoc.data()
+            });
+        }
+
+        res.json(usuarios);
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+
+
 app.get('/', async (req, res) => {
     try {
         const categoriasSnapshot = await db.collection('categoria').get();
@@ -53,6 +123,7 @@ app.get('/', async (req, res) => {
                 }
 
                 producto.images = imageUrls;
+                producto.descripcion = acortarDescripcion(producto.descripcion);
 
                 console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
 
@@ -218,6 +289,41 @@ app.post('/nuevoProducto', async (req, res) => {
     } catch (error) {
         console.error('Error al guardar el producto:', error);
         res.status(500).send('Error interno del servidor');
+    }
+});
+
+app.get('/registro', (req, res) => {
+    res.render('paginaRegistro');  // Asegúrate de que el archivo se llame 'registro.ejs' en tu directorio de vistas
+  });
+
+  app.post('/registro', async (req, res) => {
+    const { nombre, apellidos, email, telefono, edad, genero, direccion, ciudad, codigoPostal, pais, descripcion, terms } = req.body;
+
+    try {
+        // Obtener el último ID disponible y sumar 1 para usarlo como nombre del documento
+        const usersRef = db.collection('usuario');
+        const querySnapshot = await usersRef.orderBy('__name__', 'desc').limit(1).get();
+        let newId = '1'; // Asumimos que empezamos en '1' si no hay otros documentos
+
+        if (!querySnapshot.empty) {
+            const lastDocId = querySnapshot.docs[0].id;
+            newId = String(parseInt(lastDocId) + 1); // Incrementa el último ID encontrado
+        }
+
+        // Prepara los datos del usuario sin incluir un campo id
+        const userData = {
+            nombre, apellidos, email, telefono, edad, genero,
+            direccion, ciudad, codigoPostal, pais, descripcion
+            
+        };
+
+        // Guardar el nuevo usuario utilizando newId como el nombre del documento
+        await usersRef.doc(newId).set(userData);
+
+        res.send('Registro completado con éxito');
+    } catch (error) {
+        console.error('Error al guardar los datos:', error);
+        res.status(500).send('Error al procesar el registro');
     }
 });
 

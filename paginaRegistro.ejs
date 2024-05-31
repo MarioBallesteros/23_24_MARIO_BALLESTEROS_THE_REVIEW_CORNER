@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="utf-8">
-	<title>The Review Corner</title>
+	<title>Registro - The Review Corner</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
    	<!--favicon-->
 	<link rel="icon" href="imagenes/logo.png" type="image/png" />
@@ -18,11 +17,12 @@
 	<link rel="stylesheet" href="css/registerCss.css">
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/css.css">
+
 </head>
 
 <body>
 	<div class="wrapper">
-		<form action="" id="wizard">
+		<form action="/registro" method="post" id="wizard">
 			<!-- SECTION 1 -->
 			<h2></h2>
 			<section>
@@ -37,32 +37,32 @@
 						<p>Porfavor, rellena tus datos</p>
 						<div class="form-row">
 							<div class="form-holder">
-								<input type="text" placeholder="Nombre" class="form-control">
+								<input type="text" name="nombre" placeholder="Nombre" class="form-control">
 							</div>
 							<div class="form-holder">
-								<input type="text" placeholder="Apellidos" class="form-control">
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-holder">
-								<input type="text" placeholder="Correo Electrónico" class="form-control">
-							</div>
-							<div class="form-holder">
-								<input type="text" placeholder="Teléfono" class="form-control">
+								<input type="text" name="apellidos" placeholder="Apellidos" class="form-control">
 							</div>
 						</div>
 						<div class="form-row">
 							<div class="form-holder">
-								<input type="text" placeholder="Edad" class="form-control">
+								<input type="text" name="email" placeholder="Correo Electrónico" class="form-control">
+							</div>
+							<div class="form-holder">
+								<input type="text" name="telefono" placeholder="Teléfono" class="form-control">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-holder">
+								<input type="text" name="edad" placeholder="Edad" class="form-control">
 							</div>
 							<div class="form-holder" style="align-self: flex-end; transform: translateY(4px);">
 								<div class="checkbox-tick">
 									<label class="male">
-										<input type="radio" name="gender" value="male" checked> Hombre<br>
+										<input type="radio" name="genero" value="male" checked> Hombre<br>
 										<span class="checkmark"></span>
 									</label>
 									<label class="female">
-										<input type="radio" name="gender" value="female"> Mujer<br>
+										<input type="radio" name="genero" value="female"> Mujer<br>
 										<span class="checkmark"></span>
 									</label>
 								</div>
@@ -85,22 +85,21 @@
 						<p>Porfavor termina de completar la información</p>
 						<div class="form-row">
 							<div class="form-holder w-100">
-								<input type="text" placeholder="Direccion" class="form-control">
+								<input type="text" name="direccion" placeholder="Direccion" class="form-control">
 							</div>
 						</div>
 						<div class="form-row">
 							<div class="form-holder">
-								<input type="text" placeholder="Ciudad" class="form-control">
+								<input type="text" name="ciudad" placeholder="Ciudad" class="form-control">
 							</div>
 							<div class="form-holder">
-								<input type="text" placeholder="Codigo Postal" class="form-control">
+								<input type="text" name="codigoPostal" placeholder="Codigo Postal" class="form-control">
 							</div>
 						</div>
-
 						<div class="form-row">
 							<div class="select">
 								<div class="form-holder">
-									<div class="select-control">Tu Ciudad</div>
+									<div class="select-control" id="selected-country">Selecciona tu país</div>
 									<i class="zmdi zmdi-caret-down"></i>
 								</div>
 								<ul class="dropdown">
@@ -108,6 +107,7 @@
 									<li rel="Argentina">Argentina</li>
 									<li rel="Colombia">Colombia</li>
 								</ul>
+								<input type="hidden" name="pais" id="pais">
 							</div>
 							<div class="form-holder"></div>
 						</div>
@@ -128,7 +128,7 @@
 						<p>Escribe una Descripción De Tu Perfil</p>
 						<div class="form-row">
 							<div class="form-holder w-100">
-								<textarea name="" id="" placeholder="Escribe un poco de ti!" class="form-control"
+								<textarea name="descripcion" id="" placeholder="Escribe un poco de ti!" class="form-control"
 									style="height: 99px;"></textarea>
 							</div>
 						</div>
@@ -146,9 +146,16 @@
 
 	<!-- JQUERY -->
 	<script src="js/jquery-3.3.1.min.js"></script>
-
 	<!-- JQUERY STEP -->
 	<script src="js/jquery.steps.js"></script>
 	<script src="js/main.js"></script>
+	<script>
+	$('.select .dropdown li').click(function(){
+    	var selectedText = $(this).attr('rel');
+    	$('#selected-country').text(selectedText); // Actualiza el texto visible
+    	$('#pais').val(selectedText); // Actualiza el valor del input oculto
+	});
+
+	</script>
 </body>
 </html>

@@ -37,6 +37,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    async function acortarDescripcion(descripcion){
+      const limitePalabras = 10;
+      const palabras = descripcion.split(' ');
+      if (palabras.length > limitePalabras) {
+        return palabras.slice(0, limitePalabras).join(' ') + '...';
+      } else {
+        return descripcion;
+     }
+  }
+
     async function handleLogin() {
       const usernameInput = document.getElementById('username').value;
       const passwordInput = document.getElementById('password').value;
@@ -213,7 +223,7 @@
               </li>
               <li class="nav-item me-lg-1 ms-lg-1 mb-md-1 mb-sm-1 mb-cs" id="authLinks">
                 <a class="nav-link fw-bold shadow btn btn-info text-black btn-sm pd-btn" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-whatever="@getbootstrap">Iniciar Sesión</a>
-                <a href="registerPage.html" class="nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">Registrarse</a>
+                <a href="/registro" class="nav-link fw-bold shadow s-d text-black btn-sm pd-btn btn">Registrarse</a>
                </li>
               <li class="nav-item" id="userLinks" style="display: none;">
                 <span class="nav-link">Hola, <span id="userGreeting"></span></span>
