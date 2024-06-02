@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
+const bcrypt = require('bcrypt'); 
 
 const app = express();
 const port = 3000;
@@ -100,48 +101,57 @@ app.get('/usuarios_json', async (req, res) => {
 
 app.get('/', async (req, res) => {
     try {
-        const categoriasSnapshot = await db.collection('categoria').get();
-        const productos = [];
-
-        for (const categoriaDoc of categoriasSnapshot.docs) {
-            const categoriaNombre = categoriaDoc.id;
-            const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).limit(1).get();
-
-            for (const productoDoc of productosSnapshot.docs) {
-                const producto = productoDoc.data();
-                const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
-
-                let imageUrls = [];
-                if (files.length > 0) {
-                    imageUrls = await Promise.all(files.slice(1).map(async (file) => { 
-                        const [url] = await file.getSignedUrl({
-                            action: 'read',
-                            expires: '03-09-2491'
-                        });
-                        return url;
-                    }));
-                }
-
-                producto.images = imageUrls;
-                producto.descripcion = acortarDescripcion(producto.descripcion);
-
-                console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
-
-                productos.push({
-                    ...producto,
-                    categoria: categoriaNombre,
-                    id: productoDoc.id
-                });
-            }
+      const categoriasSnapshot = await db.collection('categoria').get();
+      const categorias = categoriasSnapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log(data); // Revisa que los datos de cada categoría se estén obteniendo correctamente
+        return {
+            nombre: data.id,
+            icono: data.icono // Asegúrate de tener el icono en los datos de la categoría
+        };
+    });
+      const productos = [];
+  
+      for (const categoriaDoc of categoriasSnapshot.docs) {
+        const categoriaNombre = categoriaDoc.id;
+        const productosSnapshot = await db.collection(`categoria/${categoriaNombre}/productos`).limit(1).get();
+  
+        for (const productoDoc of productosSnapshot.docs) {
+          const producto = productoDoc.data();
+          const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
+  
+          let imageUrls = [];
+          if (files.length > 0) {
+            imageUrls = await Promise.all(files.slice(1).map(async (file) => {
+              const [url] = await file.getSignedUrl({
+                action: 'read',
+                expires: '03-09-2491'
+              });
+              return url;
+            }));
+          }
+  
+          producto.images = imageUrls;
+          producto.descripcion = acortarDescripcion(producto.descripcion);
+  
+          console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
+  
+          productos.push({
+            ...producto,
+            categoria: categoriaNombre,
+            id: productoDoc.id
+          });
         }
-
-        console.log(`Productos to render: ${JSON.stringify(productos, null, 2)}`);
-        res.render('index', { productos });
+      }
+  
+      console.log(`Productos to render: ${JSON.stringify(productos, null, 2)}`);
+      res.render('index', { categorias, productos });
     } catch (error) {
-        console.error('Error al obtener los productos:', error);
-        res.status(500).send('Error interno del servidor');
+      console.error('Error al obtener los productos:', error);
+      res.status(500).send('Error interno del servidor');
     }
-});
+  });
+  
 
 
 // Ruta para obtener datos de producto basado en categoría y ID
@@ -297,7 +307,11 @@ app.get('/registro', (req, res) => {
   });
 
   app.post('/registro', async (req, res) => {
-    const { nombre, apellidos, email, telefono, edad, genero, direccion, ciudad, codigoPostal, pais, descripcion, terms } = req.body;
+    const { nombre, email, password, edad, genero, idioma, descripcion } = req.body;
+
+    if (!nombre || !email || !password) {
+        return ;
+    }
 
     try {
         // Obtener el último ID disponible y sumar 1 para usarlo como nombre del documento
@@ -310,12 +324,14 @@ app.get('/registro', (req, res) => {
             newId = String(parseInt(lastDocId) + 1); // Incrementa el último ID encontrado
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Prepara los datos del usuario sin incluir un campo id
         const userData = {
-            nombre, apellidos, email, telefono, edad, genero,
-            direccion, ciudad, codigoPostal, pais, descripcion
-            
+            nombre, email, password: hashedPassword, edad, genero, idioma, descripcion,
+            rol:"usuario"
         };
+
 
         // Guardar el nuevo usuario utilizando newId como el nombre del documento
         await usersRef.doc(newId).set(userData);
@@ -324,6 +340,55 @@ app.get('/registro', (req, res) => {
     } catch (error) {
         console.error('Error al guardar los datos:', error);
         res.status(500).send('Error al procesar el registro');
+    }
+});
+
+app.get('/usuario', async (req, res) => {
+    const userId = req.query.id;
+    try {
+        const userDoc = await db.collection('usuario').doc(userId).get();
+        if (userDoc.exists) {
+            res.json(userDoc.data());
+        } else {
+            res.status(404).send('Usuario no encontrado');
+        }
+    } catch (error) {
+        console.error('Error al obtener los datos del usuario:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+app.post('/login', async (req, res) => {
+    const { nombre, password } = req.body;
+
+    if (!nombre || !password) {
+        return res.status(400).send('Nombre de usuario y contraseña son obligatorios');
+    }
+
+    try {
+        const usersRef = db.collection('usuario');
+        const userQuery = usersRef.where('nombre', '==', nombre);
+        const querySnapshot = await userQuery.get();
+
+        if (querySnapshot.empty) {
+            return res.status(400).send('Usuario o contraseña incorrectos');
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+
+        // Comparar la contraseña encriptada
+        const passwordMatch = await bcrypt.compare(password, userData.password);
+
+        if (!passwordMatch) {
+            return res.status(400).send('Usuario o contraseña incorrectos');
+        }
+
+        // Guardar el userId y el nombre de usuario en la respuesta
+        res.status(200).send({ userId: userDoc.id, username: userData.nombre });
+    } catch (error) {
+        console.error('Error al autenticar el usuario:', error);
+        res.status(500).send('Error al iniciar sesión');
     }
 });
 

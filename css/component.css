@@ -118,3 +118,27 @@
 		margin: 0 auto;
 	}
 }
+
+/* Añade esto en tu archivo CSS */
+.carousel-item {
+	text-align: center;
+  }
+  
+  .service-card {
+	display: inline-block;
+	width: 100%;
+  }
+  
+  .icon-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100px;
+	background-color: #f8f9fa; /* Fondo para el icono */
+  }
+  
+  .categoryName {
+	display: block;
+	margin-top: 10px;
+	font-size: 1.2rem;
+  }
