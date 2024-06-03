@@ -109,52 +109,59 @@
     }
 
     async function saveProduct() {
-  const formContainer = document.getElementById('dynamicFields');
-  const inputs = formContainer.querySelectorAll('input, textarea');
-  const productData = {};
+        const formContainer = document.getElementById('dynamicFields');
+        const inputs = formContainer.querySelectorAll('input, textarea');
+        const productData = {};
 
-  inputs.forEach(input => {
-    const key = input.id.replace('input', '').charAt(0).toLowerCase() + input.id.replace('input', '').slice(1);
-    productData[key] = input.value;
-  });
+        inputs.forEach(input => {
+            const key = input.id.replace('input', '').charAt(0).toLowerCase() + input.id.replace('input', '').slice(1);
+            productData[key] = input.value;
+        });
 
-  const category = document.getElementById('inputProductType').value;
+        const category = document.getElementById('inputProductType').value;
+        if (!category) {
+            alert('Debe seleccionar una categoría.');
+            return;
+        }
 
-  if (!category) {
-    alert('Debe seleccionar una categoría.');
-    return;
-  }
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert('Debes iniciar sesión para crear un producto.');
+            return;
+        }
 
-  const categoriaRef = collection(db, `categoria/${category}/productos`);
-  const q = query(categoriaRef, orderBy('__name__', 'desc'), limit(1));
+        productData['userId'] = userId;  // Agregar el ID del usuario a los datos del producto
 
-  try {
-    const querySnapshot = await getDocs(q);
-    let newId = '1'; // Asumiendo que el ID es un string y empezamos en '1'
+        const categoriaRef = collection(db, `categoria/${category}/productos`);
+        const q = query(categoriaRef, orderBy('__name__', 'desc'), limit(1));
 
-    if (!querySnapshot.empty) {
-      const lastDocId = querySnapshot.docs[0].id;
-      newId = String(parseInt(lastDocId) + 1); // Incrementa el último ID encontrado
+        try {
+            const querySnapshot = await getDocs(q);
+            let newId = '1';
+
+            if (!querySnapshot.empty) {
+                const lastDocId = querySnapshot.docs[0].id;
+                newId = String(parseInt(lastDocId) + 1);
+            }
+
+            const productoRef = doc(db, `categoria/${category}/productos`, newId);
+            await setDoc(productoRef, productData);
+
+            alert('Producto guardado exitosamente');
+            window.location.href = '/explorar';
+        } catch (error) {
+            console.error('Error guardando el producto:', error);
+            alert('Error al guardar el producto');
+        }
     }
 
-    const productoRef = doc(db, `categoria/${category}/productos`, newId);
-    await setDoc(productoRef, productData);
-
-    alert('Producto guardado exitosamente');
-    window.location.href = '/explorar';
-  } catch (error) {
-    console.error('Error guardando el producto:', error);
-    alert('Error al guardar el producto');
-  }
-}
-
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('saveProductButton').onclick = saveProduct;
-      document.getElementById('inputProductType').onchange = (e) => {
-        loadFieldsForCategory(e.target.value);
-      };
+        document.getElementById('saveProductButton').onclick = saveProduct;
+        document.getElementById('inputProductType').onchange = (e) => {
+            loadFieldsForCategory(e.target.value);
+        };
     });
-  </script>
+</script>
 </head>
 <body>
   <div class="wrapper">

@@ -335,3 +335,59 @@ a.referencia{
     font-size: 14px;
     color: #878787;
   }
+
+/* Elimina el subrayado de los enlaces dentro de la sección de categorías */
+.category-link {
+  text-decoration: none;
+}
+
+/* Estilo del nombre de la categoría */
+.category-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #3b9ad2; /* Ajusta el color según tu preferencia */
+  text-transform: uppercase; /* Opcional: para convertir el texto a mayúsculas */
+  margin-top: 10px; /* Espacio superior */
+  margin-bottom: 0; /* Sin margen inferior */
+}
+
+/* Asegura que las imágenes no se excedan de su contenedor */
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ajusta la altura de la tarjeta de servicio */
+.service-card {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Asegura que los botones de control del carrusel estén visibles */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+  border-radius: 50%; /* Hace los botones redondos */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%; /* Ajusta el ancho de los botones para que sean más visibles */
+}
+
+/* Ajusta la altura del contenedor del carrusel */
+.carousel-inner {
+  max-height: 400px; /* Ajusta esta altura según tu preferencia */
+}
+
+.icon-wrapper img {
+  max-height: 150px; /* Ajusta esta altura según tu preferencia */
+  object-fit: contain;
+}
+
+.carousel-item {
+  transition: transform 0.5s ease-in-out;
+}

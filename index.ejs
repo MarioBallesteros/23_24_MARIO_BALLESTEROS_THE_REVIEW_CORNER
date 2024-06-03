@@ -135,16 +135,43 @@ async function loadUserInfo() {
   }
 }
 
+async function checkLoginAndRedirectNuevoProducto() {
+  const userId = localStorage.getItem('userId');
+  if (userId) {
+    window.location.href = '/nuevoProducto';
+  } else {
+    alert('Debes iniciar sesión para crear una publicación.');
+  }
+}
 
-
-    function checkLoginAndRedirect() {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        window.location.href = '/nuevoProducto';
-      } else {
-        alert('Debe iniciar sesión para crear una publicación.');
-      }
+async function checkLoginAndRedirectMisValoraciones() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('Debes iniciar sesión para ver tus valoraciones.');
+        return;
     }
+
+    try {
+        const response = await fetch('/mis-valoraciones', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        if (response.ok) {
+            const html = await response.text();
+            document.open();
+            document.write(html);
+            document.close();
+        } else {
+            alert('Error al acceder a tus valoraciones.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loginButton').onclick = handleLogin;
@@ -152,6 +179,14 @@ async function loadUserInfo() {
       document.getElementById('userIcon').addEventListener('click', loadUserInfo);
 
       updateNavbar();
+
+      const carouselElement = document.getElementById('category-carousel');
+      if (carouselElement) {
+        const carousel = new bootstrap.Carousel(carouselElement, {
+          interval: 5000, // Delay of 5 seconds
+          ride: 'carousel'
+        });
+      }
 
       document.querySelector('.nav-link[href="/"]').onclick = (e) => {
         e.preventDefault();
@@ -161,6 +196,10 @@ async function loadUserInfo() {
         e.preventDefault();
         window.location.href = '/explorar';
       };
+      document.querySelector('.nav-link[href="/mis-valoraciones"]').onclick = (e) => {
+        e.preventDefault();
+        checkLoginAndRedirectMisValoraciones();
+      };
       document.querySelector('.nav-link[href="/thefluttercorner-1/build/web/index.html"]').onclick = (e) => {
         e.preventDefault();
         window.location.href = '/thefluttercorner-1/build/web/index.html';
@@ -168,7 +207,7 @@ async function loadUserInfo() {
 
       document.getElementById('publicaValoracionButton').onclick = (e) => {
         e.preventDefault();
-        checkLoginAndRedirect();
+        checkLoginAndRedirectNuevoProducto();
       };
     });
   </script>
@@ -284,7 +323,7 @@ async function loadUserInfo() {
                 <a class="nav-link menu__link" href="/explorar">Explorar</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link menu__link" href="#advertisers">Mis Valoraciones</a>
+                <a class="nav-link menu__link" href="/mis-valoraciones">Mis Valoraciones</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link menu__link" href="/thefluttercorner-1/build/web/index.html">Sobre Nosotros</a>
@@ -335,7 +374,7 @@ async function loadUserInfo() {
               ¡Forma parte de nuestra comunidad y toma las mejores decisiones ya mismo!
             </p>
             <div>
-              <a id="publicaValoracionButton" class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="/nuevoProducto">Publica Tu Valoración</a>
+              <a id="publicaValoracionButton" class="pt-2 pb-2 pe-5 ps-5 mt-3 d-inline-block rounded-5 text-decoration-none text-bg-primary btn mb-3" href="#">Publica Tu Valoración</a>
             </div>
           </div>
           <div class="p-sm-3 col-md-5 col-sm-12 col-xs-12">
@@ -500,37 +539,55 @@ async function loadUserInfo() {
       </div>
     </section>
     <!-- BRANDS SECTION ENDED -->
-    <!-- CATEGORIES SECTION STARTS -->
-    <section id="publishers" class="publishers-service-sec pt-5 pb-5">
-      <div class="container">
-        <div class="row">
-          <div class="section-header text-center">
-            <h2 class="fw-bold fs-1">
-              Todas las
-              <span class="text-primary">Categorías</span>
-            </h2>
-            <p class="sec-icon"><i class="fa-solid fa-list"></i></p>
-          </div>
-        </div>
-        <div id="category-cards" class="row mt-5 mt-md-4 row-cols-1 row-cols-sm-1 row-cols-md-3 justify-content-center">
-          <% categorias.forEach(categoria => { %>
-            <div class="col">
-              <div class="service-card">
-                <a href="http://localhost:3000/categoria/<%= categoria.id %>">
+<!-- CATEGORIES SECTION STARTS -->
+<section id="categories" class="publishers-service-sec pt-5 pb-5">
+  <div class="container">
+    <div class="row">
+      <div class="section-header text-center">
+        <h2 class="fw-bold fs-1">
+          Todas las
+          <span class="text-primary">Categorías</span>
+        </h2>
+        <p class="sec-icon"><i class="fa-solid fa-list"></i></p>
+      </div>
+    </div>
+    <div class="position-relative">
+      <div id="category-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-inner">
+          <% categorias.forEach((categoria, index) => { %>
+            <% if (index % 4 === 0) { %>
+              <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                <div class="row justify-content-center">
+            <% } %>
+            <div class="col-md-3 d-flex align-items-stretch">
+              <div class="service-card text-center">
+                <a href="http://localhost:3000/explorar?categorias=<%= categoria.nombre %>" class="category-link">
                   <div class="icon-wrapper">
-                    <i class="fa <%= categoria.icono %> fa-3x"></i>
+                    <img src="<%= categoria.icono %>" alt="<%= categoria.nombre %> Icono" class="img-fluid mb-3" />
                   </div>
-                  <br>
-                  <h8 class="productType"><%= categoria.nombre %></h8>
+                  <h5 class="category-name"><%= categoria.nombre %></h5>
                 </a>
               </div>
             </div>
+            <% if ((index + 1) % 4 === 0 || index === categorias.length - 1) { %>
+                </div>
+              </div>
+            <% } %>
           <% }); %>
         </div>
       </div>
-    </section>
-    <!-- CATEGORIES SECTION ENDED -->
-
+      <button class="carousel-control-prev" type="button" data-bs-target="#category-carousel" data-bs-slide="prev" style="left: -3rem; top: 50%; transform: translateY(-50%);">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#category-carousel" data-bs-slide="next" style="right: -3rem; top: 50%; transform: translateY(-50%);">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+</section>
+<!-- CATEGORIES SECTION ENDED -->
     <!-- PUBLISHER SERVICE SECTION STARTS -->
     <section id="publishers" class="publishers-service-sec pt-5 pb-5">
       <div class="container">

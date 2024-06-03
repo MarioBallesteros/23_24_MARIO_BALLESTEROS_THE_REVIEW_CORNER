@@ -102,14 +102,26 @@ app.get('/usuarios_json', async (req, res) => {
 app.get('/', async (req, res) => {
     try {
       const categoriasSnapshot = await db.collection('categoria').get();
-      const categorias = categoriasSnapshot.docs.map(doc => {
-        const data = doc.data();
-        console.log(data); // Revisa que los datos de cada categoría se estén obteniendo correctamente
-        return {
-            nombre: data.id,
-            icono: data.icono // Asegúrate de tener el icono en los datos de la categoría
-        };
-    });
+      const categorias = [];
+
+      for (const categoriaDoc of categoriasSnapshot.docs) {
+        const categoriaNombre = categoriaDoc.id;
+        console.log(`Categoría encontrada: ${categoriaNombre}`); // Log de la categoría
+
+        // Obtener el URL del icono desde el almacenamiento
+        const iconoFile = `imagenesCategoria/${categoriaNombre}.png`;
+        const [icono] = await bucket.file(iconoFile).getSignedUrl({
+            action: 'read',
+            expires: '03-09-2491'
+        });
+
+        categorias.push({
+            id: categoriaNombre,
+            nombre: categoriaNombre, // Usamos el ID del documento como nombre de la categoría
+            icono: icono // URL del icono
+        });
+    }
+
       const productos = [];
   
       for (const categoriaDoc of categoriasSnapshot.docs) {
@@ -134,7 +146,7 @@ app.get('/', async (req, res) => {
           producto.images = imageUrls;
           producto.descripcion = acortarDescripcion(producto.descripcion);
   
-          console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
+        //  console.log(`Product ${producto.nombre} has image URLs: ${producto.images}`);
   
           productos.push({
             ...producto,
@@ -273,9 +285,12 @@ app.get('/nuevoProducto', async (req, res) => {
 
 app.post('/nuevoProducto', async (req, res) => {
     try {
-        const { nombre, descripcion, precio, categoria, imagenes } = req.body;
+        const { nombre, descripcion, precio, categoria, imagenes, userId } = req.body;
 
-        // Obtener el último ID disponible y sumar 1
+        if (!userId) {
+            return res.status(401).send('Acceso no autorizado. Debes iniciar sesión.');
+        }
+
         const categoriaRef = db.collection(`categoria/${categoria}/productos`);
         const q = categoriaRef.orderBy('id', 'desc').limit(1);
         const querySnapshot = await q.get();
@@ -285,14 +300,14 @@ app.post('/nuevoProducto', async (req, res) => {
             newId = doc.data().id + 1;
         });
 
-        // Guardar el nuevo producto
         await categoriaRef.doc(newId.toString()).set({
             id: newId,
             nombre,
             descripcion,
             precio,
             categoria,
-            imagenes
+            imagenes,
+            userId // Guardar el ID del usuario
         });
 
         res.redirect('/explorar');
@@ -301,6 +316,7 @@ app.post('/nuevoProducto', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 app.get('/registro', (req, res) => {
     res.render('paginaRegistro');  // Asegúrate de que el archivo se llame 'registro.ejs' en tu directorio de vistas
@@ -389,6 +405,56 @@ app.post('/login', async (req, res) => {
     } catch (error) {
         console.error('Error al autenticar el usuario:', error);
         res.status(500).send('Error al iniciar sesión');
+    }
+});
+
+app.post('/mis-valoraciones', async (req, res) => {
+    const userId = req.body.userId;
+
+    if (!userId) {
+        return res.status(401).send('Acceso no autorizado. Debes iniciar sesión.');
+    }
+
+    console.log("user id: " + userId);
+    try {
+        const categoriasSnapshot = await db.collection('categoria').get();
+        const productos = [];
+
+        for (const categoriaDoc of categoriasSnapshot.docs) {
+            const categoriaNombre = categoriaDoc.id;
+            const productosSnapshot = await db.collection(`categoria/${categoriaDoc.id}/productos`).where('userId', '==', userId).get();
+
+            for (const productoDoc of productosSnapshot.docs) {
+                const producto = productoDoc.data();
+                const [files] = await bucket.getFiles({ prefix: `imagenesReview/${categoriaNombre}/${productoDoc.id}` });
+
+                let imageUrls = [];
+                if (files.length > 0) {
+                    imageUrls = await Promise.all(files.slice(1).map(async (file) => {
+                        const [url] = await file.getSignedUrl({
+                            action: 'read',
+                            expires: '03-09-2491'
+                        });
+                        return url;
+                    }));
+                }
+                producto.images = imageUrls;
+                producto.descripcion = acortarDescripcion(producto.descripcion);
+                productos.push({
+                    ...producto,
+                    id: productoDoc.id,
+                    categoria: categoriaNombre
+                });
+            }
+        }
+
+        // Log the number of products
+        console.log(`Number of products to display: ${productos.length}`);
+
+        res.render('mis-valoraciones', { productos });
+    } catch (error) {
+        console.error('Error al obtener las valoraciones:', error);
+        res.status(500).send('Error interno del servidor');
     }
 });
 
